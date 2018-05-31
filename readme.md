@@ -1,10 +1,10 @@
-### ±àÒë¹¤³Ì¿Î³ÌÊµÑé
+### ï¿½ï¿½ï¿½ë¹¤ï¿½Ì¿Î³ï¿½Êµï¿½ï¿½
 
 #### 1.lab1 Lexical Analysis
-ÀûÓÃ felx ¶Ô Decaf ´Ê·¨·ÖÎö
+ï¿½ï¿½ï¿½ï¿½ felx ï¿½ï¿½ Decaf ï¿½Ê·ï¿½ï¿½ï¿½ï¿½ï¿½
 
 ```
-$ flex lab1/lexical_analysis/parse.l
+$ flex lab1/lexical_analysis/scanner.l
 $ gcc lab1/lexical_analysis/lex.yy.c  -o lab1/lexical_analysis/scanner
 $ ./lab1/lexical_analysis/scanner < lab1/lexical_analysis/test.c
 ```
