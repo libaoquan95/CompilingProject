@@ -1,5 +1,7 @@
 %{
-#include <stdio.h>
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <malloc.h> 
 void yyerror(const char* msg) {printf("error: %s\n", msg);}
 %}
 
@@ -52,7 +54,8 @@ void yyerror(const char* msg) {printf("error: %s\n", msg);}
 %left '*' '/'
 
 %%
-Program     :   DeclList                { printf("Program -> DeclList\n"); @1 } ;
+Program     :   DeclList                { printf("Program -> DeclList\n"); } 
+            ;
 
 DeclList    :   DeclList Decl           { printf("DeclList -> DeclList Decl\n"); } 
             |   /* empty */             { printf("DeclList ->\n"); }
@@ -64,119 +67,150 @@ Decl        :   VariableDecl            { printf("Decl -> VaruableDecl\n"); }
             |   FunctionDecl            { printf("Decl -> FunctionDecl\n"); } 
             ;
             
-VariableDecl:   Variable ';'            { printf("VariableDecl -> Variable\n"); } ;
+VariableDecl:   Variable ';'            { printf("VariableDecl -> Variable ;\n"); } 
+            ;
 
 /* 变量定义 */
-Variable    :   Type T_Identifier       { printf("Variable -> Identifier\n"); } ;
+Variable    :   Type T_Identifier       { printf("Variable -> Type Identifier\n");   } 
+            ;
 
 /* 变量类型 */
-Type        :   T_Int                   { printf("Type -> Int\n"); } 
-            |   T_Double                { printf("Type -> Double\n");} 
-            |   T_Boolean               { printf("Type -> Bool\n");} 
-            |   T_String                { printf("Type -> String\n");} 
-            |   T_Void                  { printf("Type ->Void\n");} 
-            |   T_Class T_Identifier    { printf("Type ->Identifier\n");} 
-            |   Type '[' ']'            { printf("Type -> Type[]\n");} 
+Type        :   T_Int                   { printf("Type -> Int\n");       } 
+            |   T_Double                { printf("Type -> Double\n");    } 
+            |   T_Boolean               { printf("Type -> Bool\n");      } 
+            |   T_String                { printf("Type -> String\n");    } 
+            |   T_Void                  { printf("Type -> Void\n");      } 
+            |   T_Class T_Identifier    { printf("Type -> Identifier\n");} 
+            |   Type '[' ']'            { printf("Type -> Type[]\n");    } 
             ;
 
 /* 函数定义 */            
-FunctionDecl:   Type T_Identifier '(' Formals ')' ';'           { printf("FunctionDecl ->Identifier\n");} ;
+FunctionDecl:   Type T_Identifier '(' Formals ')' ';'                
+                                        { printf("FunctionDecl ->Identifier\n");} 
+            ;
 
 /* 函数参数列表 */
 Formals     :   Variable '+' ','        { printf("Formals -> Variable+,\n"); } 
-            |   /* empty */             { printf("Formals -> \n");} 
+            |   /* empty */             { printf("Formals -> \n");           } 
             ;
 
 /* 函数体 */             
-FunctionDefn:   Type T_Identifier '(' Formals ')' StmtBlock     { printf("FunctionDefn -> Identifier\n");} ;
-
-/* 类定义 */  
-ClassDefn   :   T_Class T_Identifier '<' T_Extends T_Identifier '>' '{' Fieldlist '}' { printf("Class Identifier < Extends Identifier > { Fieldlist } \n");} ;
-
-Fieldlist   :   Fieldlist Field         { printf(" Fieldlist -> Fieldlist Field\n");} 
-            |   /* empty */             { printf(" Fieldlist -> \n");}
+FunctionDefn:   Type T_Identifier '(' Formals ')' StmtBlock        
+                                        { printf("FunctionDefn -> Identifier\n");} 
             ;
 
-Field       :   VariableDecl            { printf("Field -> VariableDecl\n");} 
-            |   FunctionDecl            { printf("Field -> FunctionDecl\n ");} 
-            |   FunctionDefn            { printf("Field -> FunctionDefn\n ");} 
+/* 类定义 */  
+ClassDefn   :   T_Class T_Identifier '<' T_Extends T_Identifier '>' '{' Fieldlist '}'   
+                                        { printf("Class Identifier < Extends Identifier > { Fieldlist } \n");} 
+            ;
+
+Fieldlist   :   Fieldlist Field         { printf(" Fieldlist -> Fieldlist Field\n"); } 
+            |   /* empty */             { printf(" Fieldlist -> \n");                }
+            ;
+
+Field       :   VariableDecl            { printf("Field -> VariableDecl\n");      } 
+            |   FunctionDecl            { printf("Field -> FunctionDecl\n ");     } 
+            |   FunctionDefn            { printf("Field -> FunctionDefn\n ");     } 
             ;
 
 /* 语句块 */            
-StmtBlock   :   '{' Stmtlist '}'        { printf("StmtBlock ->:{ Stmtlist } \n");} ;
-
-Stmtlist    :   Stmtlist Stmt           { printf("Stmtlist -> Stmtlist Stmt\n ");} ;
-
-Stmt        :   VariableDecl            { printf(" Stmt -> VariableDecl\n ");} 
-            |   SimpleStmt ';'          { printf(" Stmt ->SimpleStmt；\n ");} 
-            |   IfStmt                  { printf(" Stmt ->IfStmt\n ");} 
-            |   WhileStmt               { printf(" Stmt -> WhileStmt \n ");} 
-            |   ForStmt                 { printf(" Stmt -> ForStmt \n ");} 
-            |   ReturnStmt ';'          { printf(" Stmt ->ReturnStmt；\n ");} 
-            |   PrintStmt ';'           { printf(" Stmt -> PrintStmt ；\n ");} 
-            |   StmtBlock               { printf(" Stmt -> StmtBlock \n ");}
+StmtBlock   :   '{' Stmtlist '}'        { printf("StmtBlock ->:{ Stmtlist } \n"); } 
             ;
 
-SimpleStmt  :   LValue '=' Expr { printf(" SimpleStmt ->LValue = Expr \n");} 
-            |   Expr { printf(" SimpleStmt -> Expr \n");} 
-            |   { printf(" SimpleStmt -> \n");} 
+Stmtlist    :    Stmt Stmtlist_         { printf("Stmtlist -> Stmtlist Stmt\n "); } 
+            ;
+Stmtlist_   :    Stmt Stmtlist_         { printf(" ");                }
+            |   /* empty */             { printf(" ");                }
+            ;
+
+/*
+Stmtlist    :   Stmtlist Stmt           { printf("Stmtlist -> Stmtlist Stmt\n "); } 
+            ;
+*/
+Stmt        :   VariableDecl            { printf(" Stmt -> VariableDecl\n ");     } 
+            |   SimpleStmt ';'          { printf(" Stmt ->SimpleStmt；\n ");      } 
+            |   IfStmt                  { printf(" Stmt ->IfStmt\n ");            } 
+            |   WhileStmt               { printf(" Stmt -> WhileStmt \n ");       } 
+            |   ForStmt                 { printf(" Stmt -> ForStmt \n ");         } 
+            |   ReturnStmt ';'          { printf(" Stmt ->ReturnStmt；\n ");      } 
+            |   PrintStmt ';'           { printf(" Stmt -> PrintStmt ；\n ");     } 
+            |   StmtBlock               { printf(" Stmt -> StmtBlock \n ");       }
+            ;
+
+/* 赋值语句 */
+SimpleStmt  :   LValue '=' Expr         { printf(" SimpleStmt ->LValue = Expr \n"); } 
+            |   Expr                    { printf(" SimpleStmt -> Expr \n");         } 
+            |   /* empty */             { printf(" SimpleStmt -> \n");              } 
+            ;
+
+/* 数组[] 和 <.> */            
+LValue      :   '<' Expr '.' '>' T_Identifier   { printf(" LValue -> :< Expr . > \n"); } 
+            |    Expr '[' Expr ']'              { printf(" LValue -> [ Expr ] \n");    } 
+            ;
+
+/* 调用 */            
+Call        :   '<'Expr '.' '>' T_Identifier '(' Actuals ')'                
+                                        { printf(" Call -><Expr .> T_Identifier ( Actuals ) \n");} 
+            ;
+
+Actuals     :   Expr '+' ','            { printf(" Actuals -> Expr +, \n"); } 
+            |   /* empty */             { printf(" Actuals -> \n");         } 
             ;
             
-LValue      :   '<' Expr '.' '>' T_Identifier   { printf(" LValue -> :< Expr . > \n");} 
-            |    Expr '[' Expr ']'              { printf(" LValue -> [ Expr ] \n");} 
+ForStmt     :   T_For '(' SimpleStmt ';' BoolExpr ';' SimpleStmt ')' Stmt   
+                                        { printf(" ForStmt ->For (SimpleStmt BoolExpr SimpleStmt ) Stmt \n");} 
+            ;
+
+WhileStmt   :   T_While '(' BoolExpr ')' Stmt
+                                        { printf("WhileStmt->While ( BoolExpr ) Stmt \n");} 
+            ;
+
+IfStmt      :   T_If '(' BoolExpr ')' Stmt '<' T_Else Stmt '>'
+                                        { printf("IfStmt->If (BoolExpr ) Stmt <Else Stmt > \n");}
+            ;
+
+ReturnStmt  :   T_Return                { printf(" ReturnStmt ->Return\n");       } 
+            |   T_Return Expr           { printf(" ReturnStmt ->Return Expr \n"); } 
             ;
             
-Call        :   '<'Expr '.' '>' T_Identifier '(' Actuals ')' { printf(" Call -><Expr .> T_Identifier ( Actuals ) \n");} ;
-
-Actuals     :   Expr '+' ','    { printf(" Actuals -> Expr +, \n");} 
-            |   /* empty */     { printf(" Actuals -> \n");} 
+PrintStmt   :   T_Print '(' Expr '+' ',' ')'    { printf("PrintStmt->Print (Expr+ ,) \n");} 
             ;
-            
-ForStmt     :   T_For '(' SimpleStmt ';' BoolExpr ';' SimpleStmt ')' Stmt { printf(" ForStmt ->For (SimpleStmt BoolExpr SimpleStmt ) Stmt \n");} ;
 
-WhileStmt   :   T_While '(' BoolExpr ')' Stmt       { printf("WhileStmt->While ( BoolExpr ) Stmt \n");} ;
-
-IfStmt      :   T_If '(' BoolExpr ')' Stmt '<' T_Else Stmt '>' { printf("IfStmt->If (BoolExpr ) Stmt <Else Stmt > \n");} ;
-
-ReturnStmt  :   T_Return        { printf(" ReturnStmt ->Return\n");} 
-            |   T_Return Expr   { printf(" ReturnStmt ->Return Expr \n");} 
+BoolExpr    :   Expr                        { printf("BoolExpr ->Expr\n");          } 
             ;
-            
-PrintStmt   :   T_Print '(' Expr '+' ',' ')'    { printf("PrintStmt->Print (Expr+ ,) \n");} ;
 
-BoolExpr    :   Expr             { printf("BoolExpr ->Expr\n");} ;
-
-Expr        :   Constant        { printf("Expr ->Constant\n");} 
-            |   LValue          { printf("Expr ->LValue\n");} 
-            |   T_This          { printf("Expr ->This\n");} 
-            |   Call            { printf("Expr ->Call\n");} 
-            |   '(' Expr')'     { printf("Expr ->( Expr) \n");} 
-            |   Expr '+' Expr   { printf("Expr ->Expr + Expr \n");} 
-            |   Expr '-' Expr   { printf("Expr ->Expr - Expr \n");} 
-            |   Expr '*' Expr   { printf("Expr ->Expr * Expr \n");} 
-            |   Expr '/' Expr   { printf("Expr ->Expr /Expr \n");} 
-            |   Expr '%' Expr   { printf("Expr ->Expr % Expr \n");} 
-            |   '-' Expr        { printf("Expr -> - Expr \n");} 
-            |   Expr '<' Expr   { printf("Expr ->Expr < Expr \n");} 
-            |   Expr T_Le Expr       { printf("Expr ->LessEqual Expr \n");} 
-            |   Expr '>' Expr               { printf("Expr ->Expr >Expr \n");} 
-            |   Expr T_Ge Expr    { printf("Expr ->GreaterEqual\n");} 
-            |   Expr T_Eq Expr           { printf("Expr ->Equal Expr \n");} 
-            |   Expr T_Ne Expr        { printf("Expr ->NotEqual Expr \n");} 
-            |   Expr T_And Expr             { printf("Expr ->And Expr \n");} 
-            |   Expr T_Or Expr              { printf("Expr ->Or Expr \n");} 
-            |   '!' Expr                    { printf("Expr ->! Expr \n");} 
-            |   T_ReadInteger '(' ')'       { printf("Expr ->Expr ReadInteger ( ) \n");} 
-            |   T_ReadLine '(' ')'          { printf("Expr ->Expr ReadLine ( ) \n");} 
-            |   T_New '(' T_Identifier ')'  { printf("Expr ->New ( Identifier ) \n");}
+Expr        :   Constant                    { printf("Expr ->Constant\n");          } 
+            |   LValue                      { printf("Expr ->LValue\n");            } 
+            |   T_This                      { printf("Expr ->This\n");              } 
+            |   Call                        { printf("Expr ->Call\n");              } 
+            |   '(' Expr')'                 { printf("Expr ->( Expr) \n");          } 
+            |   Expr '+' Expr               { printf("Expr ->Expr + Expr \n");      } 
+            |   Expr '-' Expr               { printf("Expr ->Expr - Expr \n");      } 
+            |   Expr '*' Expr               { printf("Expr ->Expr * Expr \n");      } 
+            |   Expr '/' Expr               { printf("Expr ->Expr /Expr \n");       } 
+            |   Expr '%' Expr               { printf("Expr ->Expr % Expr \n");      } 
+            |   '-' Expr                    { printf("Expr -> - Expr \n");          } 
+            |   Expr '<' Expr               { printf("Expr ->Expr < Expr \n");      } 
+            |   Expr T_Le Expr              { printf("Expr ->LessEqual Expr \n");   } 
+            |   Expr '>' Expr               { printf("Expr ->Expr >Expr \n");       } 
+            |   Expr T_Ge Expr              { printf("Expr ->GreaterEqual\n");      } 
+            |   Expr T_Eq Expr              { printf("Expr ->Equal Expr \n");       } 
+            |   Expr T_Ne Expr              { printf("Expr ->NotEqual Expr \n");    } 
+            |   Expr T_And Expr             { printf("Expr ->And Expr \n");         } 
+            |   Expr T_Or Expr              { printf("Expr ->Or Expr \n");          } 
+            |   '!' Expr                    { printf("Expr ->! Expr \n");           } 
+            |   T_ReadInteger '(' ')'       { printf("Expr ->Expr ReadInteger ( ) \n"); } 
+            |   T_ReadLine '(' ')'          { printf("Expr ->Expr ReadLine ( ) \n");    } 
+            |   T_New '(' T_Identifier ')'  { printf("Expr ->New ( Identifier ) \n");   }
             |   T_NewArray '(' Expr ',' Type ')' { printf("Expr ->NewArray ( Expr , Type )\n");} 
             ;
-            
-Constant    :   T_IntConstant       { printf("Constant ->IntConstant\n");} 
-            |   T_DoubleConstant    { printf("Constant ->DoubleConstant\n");} 
-            |   T_BooleanConstant      { printf("Constant ->BoolConstant\n");} 
-            |   T_StringConstant    { printf("Constant ->StringConstant\n");} 
-            |   T_Null              { printf("Constant -> Null\n");}
+
+/* 常量 */            
+Constant    :   T_IntConstant               { printf("Constant ->IntConstant\n");       } 
+            |   T_DoubleConstant            { printf("Constant ->DoubleConstant\n");    } 
+            |   T_BooleanConstant           { printf("Constant ->BoolConstant\n");      }  
+            |   T_StringConstant            { printf("Constant ->StringConstant\n");    } 
+            |   T_Null                      { printf("Constant -> Null\n");             }
             ;
 
 %%
