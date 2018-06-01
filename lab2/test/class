@@ -1,0 +1,13 @@
+class cla1 {
+    int i1;
+    string s1;
+    bool b1;
+    double d1;
+}
+
+calss cla2 <extends cla1> {
+   int fun1(int a, int b);
+   void fun2() {
+       i1 + 1;
+   }
+}
