@@ -78,7 +78,8 @@ extern int yydebug;
     T_DoubleConstant,
     T_StringConstant,
     T_Identifier,
-    T_BooleanConstant
+    T_BooleanConstant,
+    T_Lineend
   };
 #endif
 /* Tokens.  */
@@ -116,6 +117,7 @@ extern int yydebug;
 #define	T_StringConstant	288
 #define	T_Identifier		289
 #define	T_BooleanConstant	290
+#define	T_Lineend	        291
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -128,5 +130,8 @@ typedef int YYSTYPE;
 extern YYSTYPE yylval;
 
 int yyparse (void);
+
+
+int cur_line_num = 1;
 
 #endif /* !YY_YY_Y_TAB_H_INCLUDED  */

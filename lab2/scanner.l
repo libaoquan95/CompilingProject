@@ -1,7 +1,6 @@
 %{
 //#include "token.h"
 #include "y.tab.h"
-int cur_line_num = 1;
 void lex_error(char* msg, int line);
 %}
 
@@ -20,7 +19,7 @@ comment      ("//"[^\n]*)|("/*"[^\*/]*"\*/")
 
 
 %%
-[\n]           { cur_line_num ++;          }
+[\n]           { cur_line_num++;           }
 {operator}     { return yytext[0];         }   
 "<="           { return T_Le;              }
 ">="           { return T_Ge;              }
@@ -75,3 +74,4 @@ void lex_error(char* msg, int line) {
 int yywrap(void) {
     return 1;
 }
+
