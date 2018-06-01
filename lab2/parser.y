@@ -2,7 +2,9 @@
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <malloc.h> 
-void yyerror(const char* msg) {printf("error: %s\n", msg);}
+void yyerror(const char* msg) {
+    printf("error: %s\n", msg);
+}
 %}
 
 %start Program
@@ -54,163 +56,169 @@ void yyerror(const char* msg) {printf("error: %s\n", msg);}
 %left '*' '/'
 
 %%
-Program     :   DeclList                { printf("Program -> DeclList\n"); } 
+Program     :   DeclList                { printf("%20s -> %s \n", "Program", "DeclList"); } 
+            |   error;
             ;
 
-DeclList    :   DeclList Decl           { printf("DeclList -> DeclList Decl\n"); } 
-            |   /* empty */             { printf("DeclList ->\n"); }
+DeclList    :   DeclList Decl           { printf("%20s -> %s \n",  "DeclList", "DeclList Decl"); } 
+            |   /* empty */             { printf("%20s -> %s \n",  "DeclList", " ");             }
+            |   error;
             ;
 
-Decl        :   VariableDecl            { printf("Decl -> VaruableDecl\n"); } 
-            |   ClassDefn               { printf("Decl -> ClassDefn\n");} 
-            |   FunctionDefn            { printf("Decl -> FunctionDefn\n"); } 
-            |   FunctionDecl            { printf("Decl -> FunctionDecl\n"); } 
+Decl        :   VariableDecl            { printf("%20s -> %s \n",  "Decl", "VaruableDecl"); } 
+            |   ClassDefn               { printf("%20s -> %s \n",  "Decl", "ClassDefn");    } 
+            |   FunctionDefn            { printf("%20s -> %s \n",  "Decl", "FunctionDefn"); } 
+            |   FunctionDecl            { printf("%20s -> %s \n",  "Decl", "FunctionDecl"); } 
+            |   error;
             ;
             
-VariableDecl:   Variable ';'            { printf("VariableDecl -> Variable ;\n"); } 
+VariableDecl:   Variable ';'            { printf("%20s -> %s \n",  "VariableDecl", "Variable ;"); } 
+            |   error;
             ;
 
 /* 变量定义 */
-Variable    :   Type T_Identifier       { printf("Variable -> Type Identifier\n");   } 
+Variable    :   Type T_Identifier       { printf("%20s -> %s \n",  "Variable", "Type Identifier");   } 
+            |   error;
             ;
 
 /* 变量类型 */
-Type        :   T_Int                   { printf("Type -> Int\n");       } 
-            |   T_Double                { printf("Type -> Double\n");    } 
-            |   T_Boolean               { printf("Type -> Bool\n");      } 
-            |   T_String                { printf("Type -> String\n");    } 
-            |   T_Void                  { printf("Type -> Void\n");      } 
-            |   T_Class T_Identifier    { printf("Type -> Identifier\n");} 
-            |   Type '[' ']'            { printf("Type -> Type[]\n");    } 
+Type        :   T_Int                   { printf("%20s -> %s \n",  "Type", "Int");       } 
+            |   T_Double                { printf("%20s -> %s \n",  "Type", "Double");    } 
+            |   T_Boolean               { printf("%20s -> %s \n",  "Type", "Bool");      } 
+            |   T_String                { printf("%20s -> %s \n",  "Type", "String");    } 
+            |   T_Void                  { printf("%20s -> %s \n",  "Type", "Void");      } 
+            |   T_Class T_Identifier    { printf("%20s -> %s \n",  "Type", "Identifier");} 
+            |   Type '[' ']'            { printf("%20s -> %s \n",  "Type", "Type[]");    } 
+            |   error;
             ;
 
 /* 函数定义 */            
 FunctionDecl:   Type T_Identifier '(' Formals ')' ';'                
-                                        { printf("FunctionDecl ->Identifier\n");} 
+                                        { printf("%20s -> %s \n",  "FunctionDecl", "Identifier");} 
             ;
 
 /* 函数参数列表 */
-Formals     :   Variable '+' ','        { printf("Formals -> Variable+,\n"); } 
-            |   /* empty */             { printf("Formals -> \n");           } 
+Formals     :   Variable '+' ','        { printf("%20s -> %s \n",  "Formals", "Variable+,"); } 
+            |   /* empty */             { printf("%20s -> %s \n",  "Formals", " ");          } 
+            |   error;
             ;
 
 /* 函数体 */             
 FunctionDefn:   Type T_Identifier '(' Formals ')' StmtBlock        
-                                        { printf("FunctionDefn -> Identifier\n");} 
+                                        { printf("%20s -> %s \n",  "FunctionDefn", "Identifier");} 
             ;
 
 /* 类定义 */  
 ClassDefn   :   T_Class T_Identifier '<' T_Extends T_Identifier '>' '{' Fieldlist '}'   
-                                        { printf("Class Identifier < Extends Identifier > { Fieldlist } \n");} 
+                                        { printf("Class Identifier < Extends Identifier > { Fieldlist } ");} 
             ;
 
-Fieldlist   :   Fieldlist Field         { printf(" Fieldlist -> Fieldlist Field\n"); } 
-            |   /* empty */             { printf(" Fieldlist -> \n");                }
+Fieldlist   :   Fieldlist Field         { printf("%20s -> %s \n",  "Fieldlist", "Fieldlist Field"); } 
+            |   /* empty */             { printf("%20s -> %s \n",  "Fieldlist", " ");               }
+            |   error;
             ;
 
-Field       :   VariableDecl            { printf("Field -> VariableDecl\n");      } 
-            |   FunctionDecl            { printf("Field -> FunctionDecl\n ");     } 
-            |   FunctionDefn            { printf("Field -> FunctionDefn\n ");     } 
+Field       :   VariableDecl            { printf("%20s -> %s \n",  "Field", "VariableDecl");     } 
+            |   FunctionDecl            { printf("%20s -> %s \n",  "Field", "FunctionDecl");     } 
+            |   FunctionDefn            { printf("%20s -> %s \n",  "Field", "FunctionDefn");     } 
             ;
 
 /* 语句块 */            
-StmtBlock   :   '{' Stmtlist '}'        { printf("StmtBlock ->:{ Stmtlist } \n"); } 
+StmtBlock   :   '{' Stmtlist '}'        { printf("%20s -> %s \n",  "StmtBlock", ":{ Stmtlist } ");} 
+            |   error;
             ;
 
-Stmtlist    :    Stmt Stmtlist_         { printf("Stmtlist -> Stmtlist Stmt\n "); } 
-            ;
-Stmtlist_   :    Stmt Stmtlist_         { printf(" ");                }
-            |   /* empty */             { printf(" ");                }
+Stmtlist    :   Stmtlist Stmt           { printf("%20s -> %s \n",  "Stmtlist", "Stmtlist Stmt"); } 
+            |   /* empty */             { printf("%20s -> %s \n",  "Stmtlist", " ");             }
             ;
 
-/*
-Stmtlist    :   Stmtlist Stmt           { printf("Stmtlist -> Stmtlist Stmt\n "); } 
-            ;
-*/
-Stmt        :   VariableDecl            { printf(" Stmt -> VariableDecl\n ");     } 
-            |   SimpleStmt ';'          { printf(" Stmt ->SimpleStmt；\n ");      } 
-            |   IfStmt                  { printf(" Stmt ->IfStmt\n ");            } 
-            |   WhileStmt               { printf(" Stmt -> WhileStmt \n ");       } 
-            |   ForStmt                 { printf(" Stmt -> ForStmt \n ");         } 
-            |   ReturnStmt ';'          { printf(" Stmt ->ReturnStmt；\n ");      } 
-            |   PrintStmt ';'           { printf(" Stmt -> PrintStmt ；\n ");     } 
-            |   StmtBlock               { printf(" Stmt -> StmtBlock \n ");       }
+Stmt        :   VariableDecl            { printf("%20s -> %s \n",  "Stmt", "VariableDecl");     } 
+            |   SimpleStmt ';'          { printf("%20s -> %s \n",  "Stmt", "SimpleStmt；");     } 
+            |   IfStmt                  { printf("%20s -> %s \n",  "Stmt", "IfStmt");           } 
+            |   WhileStmt               { printf("%20s -> %s \n",  "Stmt", "WhileStmt ");       } 
+            |   ForStmt                 { printf("%20s -> %s \n",  "Stmt", "ForStmt ");         } 
+            |   ReturnStmt ';'          { printf("%20s -> %s \n",  "Stmt", "ReturnStmt；");     } 
+            |   PrintStmt ';'           { printf("%20s -> %s \n",  "Stmt", "PrintStmt ；");     } 
+            |   StmtBlock               { printf("%20s -> %s \n",  "Stmt", "StmtBlock ");       }
             ;
 
 /* 赋值语句 */
-SimpleStmt  :   LValue '=' Expr         { printf(" SimpleStmt ->LValue = Expr \n"); } 
-            |   Expr                    { printf(" SimpleStmt -> Expr \n");         } 
-            |   /* empty */             { printf(" SimpleStmt -> \n");              } 
+SimpleStmt  :   LValue '=' Expr         { printf("%20s -> %s \n",  "SimpleStmt", "LValue = Expr ");} 
+            |   Expr                    { printf("%20s -> %s \n",  "SimpleStmt", "Expr ");         } 
+            |   /* empty */             { printf("%20s -> %s \n",  "SimpleStmt", " ");             } 
+            |   error;
             ;
 
 /* 数组[] 和 <.> */            
-LValue      :   '<' Expr '.' '>' T_Identifier   { printf(" LValue -> :< Expr . > \n"); } 
-            |    Expr '[' Expr ']'              { printf(" LValue -> [ Expr ] \n");    } 
+LValue      :   '<' Expr '.' '>' T_Identifier   { printf("%20s -> %s \n",  "LValue", ":< Expr . > "); } 
+            |   Expr '[' Expr ']'               { printf("%20s -> %s \n",  "LValue", "[ Expr ] ");    } 
+            |   error;
             ;
 
 /* 调用 */            
 Call        :   '<'Expr '.' '>' T_Identifier '(' Actuals ')'                
-                                        { printf(" Call -><Expr .> T_Identifier ( Actuals ) \n");} 
+                                        { printf("%20s -> %s \n", "Call", "<Expr .> T_Identifier ( Actuals ) ");} 
             ;
 
-Actuals     :   Expr '+' ','            { printf(" Actuals -> Expr +, \n"); } 
-            |   /* empty */             { printf(" Actuals -> \n");         } 
+Actuals     :   Expr '+' ','            { printf("%20s -> %s \n",  "Actuals", "Expr +, "); } 
+            |   /* empty */             { printf("%20s -> %s \n",  "Actuals", "");         } 
+            |   error;
             ;
             
 ForStmt     :   T_For '(' SimpleStmt ';' BoolExpr ';' SimpleStmt ')' Stmt   
-                                        { printf(" ForStmt ->For (SimpleStmt BoolExpr SimpleStmt ) Stmt \n");} 
+                                        { printf("%20s -> %s \n",  "ForStmt", "For (SimpleStmt BoolExpr SimpleStmt ) Stmt ");} 
             ;
 
 WhileStmt   :   T_While '(' BoolExpr ')' Stmt
-                                        { printf("WhileStmt->While ( BoolExpr ) Stmt \n");} 
+                                        { printf("%20s -> %s \n",  "WhileStmt", "While ( BoolExpr ) Stmt ");} 
             ;
 
 IfStmt      :   T_If '(' BoolExpr ')' Stmt '<' T_Else Stmt '>'
-                                        { printf("IfStmt->If (BoolExpr ) Stmt <Else Stmt > \n");}
+                                        { printf("%20s -> %s \n",  "IfStmt", "If (BoolExpr ) Stmt <Else Stmt > ");}
             ;
 
-ReturnStmt  :   T_Return                { printf(" ReturnStmt ->Return\n");       } 
-            |   T_Return Expr           { printf(" ReturnStmt ->Return Expr \n"); } 
+ReturnStmt  :   T_Return                { printf("%20s -> %s \n",  "ReturnStmt", "Return");       } 
+            |   T_Return Expr           { printf("%20s -> %s \n",  "ReturnStmt", "Return Expr "); } 
             ;
             
-PrintStmt   :   T_Print '(' Expr '+' ',' ')'    { printf("PrintStmt->Print (Expr+ ,) \n");} 
+PrintStmt   :   T_Print '(' Expr '+' ',' ')'    { printf("%20s -> %s \n",  "PrintStmt", "Print (Expr+ ,) ");} 
             ;
 
-BoolExpr    :   Expr                        { printf("BoolExpr ->Expr\n");          } 
+BoolExpr    :   Expr                        { printf("%20s -> %s \n",  "BoolExpr", "Expr");          } 
             ;
 
-Expr        :   Constant                    { printf("Expr ->Constant\n");          } 
-            |   LValue                      { printf("Expr ->LValue\n");            } 
-            |   T_This                      { printf("Expr ->This\n");              } 
-            |   Call                        { printf("Expr ->Call\n");              } 
-            |   '(' Expr')'                 { printf("Expr ->( Expr) \n");          } 
-            |   Expr '+' Expr               { printf("Expr ->Expr + Expr \n");      } 
-            |   Expr '-' Expr               { printf("Expr ->Expr - Expr \n");      } 
-            |   Expr '*' Expr               { printf("Expr ->Expr * Expr \n");      } 
-            |   Expr '/' Expr               { printf("Expr ->Expr /Expr \n");       } 
-            |   Expr '%' Expr               { printf("Expr ->Expr % Expr \n");      } 
-            |   '-' Expr                    { printf("Expr -> - Expr \n");          } 
-            |   Expr '<' Expr               { printf("Expr ->Expr < Expr \n");      } 
-            |   Expr T_Le Expr              { printf("Expr ->LessEqual Expr \n");   } 
-            |   Expr '>' Expr               { printf("Expr ->Expr >Expr \n");       } 
-            |   Expr T_Ge Expr              { printf("Expr ->GreaterEqual\n");      } 
-            |   Expr T_Eq Expr              { printf("Expr ->Equal Expr \n");       } 
-            |   Expr T_Ne Expr              { printf("Expr ->NotEqual Expr \n");    } 
-            |   Expr T_And Expr             { printf("Expr ->And Expr \n");         } 
-            |   Expr T_Or Expr              { printf("Expr ->Or Expr \n");          } 
-            |   '!' Expr                    { printf("Expr ->! Expr \n");           } 
-            |   T_ReadInteger '(' ')'       { printf("Expr ->Expr ReadInteger ( ) \n"); } 
-            |   T_ReadLine '(' ')'          { printf("Expr ->Expr ReadLine ( ) \n");    } 
-            |   T_New '(' T_Identifier ')'  { printf("Expr ->New ( Identifier ) \n");   }
-            |   T_NewArray '(' Expr ',' Type ')' { printf("Expr ->NewArray ( Expr , Type )\n");} 
+Expr        :   Constant                    { printf("%20s -> %s \n",  "Expr", "Constant");          } 
+            |   LValue                      { printf("%20s -> %s \n",  "Expr", "LValue");            } 
+            |   T_This                      { printf("%20s -> %s \n",  "Expr", "This");              } 
+            |   Call                        { printf("%20s -> %s \n",  "Expr", "Call");              } 
+            |   '(' Expr')'                 { printf("%20s -> %s \n",  "Expr", "( Expr) ");          } 
+            |   Expr '+' Expr               { printf("%20s -> %s \n",  "Expr", "Expr + Expr ");      } 
+            |   Expr '-' Expr               { printf("%20s -> %s \n",  "Expr", "Expr - Expr ");      } 
+            |   Expr '*' Expr               { printf("%20s -> %s \n",  "Expr", "Expr * Expr ");      } 
+            |   Expr '/' Expr               { printf("%20s -> %s \n",  "Expr", "Expr /Expr ");       } 
+            |   Expr '%' Expr               { printf("%20s -> %s \n",  "Expr", "Expr % Expr ");      } 
+            |   '-' Expr                    { printf("%20s -> %s \n",  "Expr", "- Expr ");           } 
+            |   Expr '<' Expr               { printf("%20s -> %s \n",  "Expr", "Expr < Expr ");      } 
+            |   Expr T_Le Expr              { printf("%20s -> %s \n",  "Expr", "LessEqual Expr ");   } 
+            |   Expr '>' Expr               { printf("%20s -> %s \n",  "Expr", "Expr >Expr ");       } 
+            |   Expr T_Ge Expr              { printf("%20s -> %s \n",  "Expr", "GreaterEqual");      } 
+            |   Expr T_Eq Expr              { printf("%20s -> %s \n",  "Expr", "Equal Expr ");       } 
+            |   Expr T_Ne Expr              { printf("%20s -> %s \n",  "Expr", "NotEqual Expr ");    } 
+            |   Expr T_And Expr             { printf("%20s -> %s \n",  "Expr", "And Expr ");         } 
+            |   Expr T_Or Expr              { printf("%20s -> %s \n",  "Expr", "Or Expr ");          } 
+            |   '!' Expr                    { printf("%20s -> %s \n",  "Expr", "! Expr ");           } 
+            |   T_ReadInteger '(' ')'       { printf("%20s -> %s \n",  "Expr", "Expr ReadInteger ( ) "); } 
+            |   T_ReadLine '(' ')'          { printf("%20s -> %s \n",  "Expr", "Expr ReadLine ( ) ");    } 
+            |   T_New '(' T_Identifier ')'  { printf("%20s -> %s \n",  "Expr", "New ( Identifier ) ");   }
+            |   T_NewArray '(' Expr ',' Type ')' { printf("%20s -> %s \n",  "Expr", "NewArray ( Expr , Type )");} 
             ;
 
 /* 常量 */            
-Constant    :   T_IntConstant               { printf("Constant ->IntConstant\n");       } 
-            |   T_DoubleConstant            { printf("Constant ->DoubleConstant\n");    } 
-            |   T_BooleanConstant           { printf("Constant ->BoolConstant\n");      }  
-            |   T_StringConstant            { printf("Constant ->StringConstant\n");    } 
-            |   T_Null                      { printf("Constant -> Null\n");             }
+Constant    :   T_IntConstant               { printf("%20s -> %s \n",  "Constant", "IntConstant");       } 
+            |   T_DoubleConstant            { printf("%20s -> %s \n",  "Constant", "DoubleConstant");    } 
+            |   T_BooleanConstant           { printf("%20s -> %s \n",  "Constant", "BoolConstant");      }  
+            |   T_StringConstant            { printf("%20s -> %s \n",  "Constant", "StringConstant");    } 
+            |   T_Null                      { printf("%20s -> %s \n",  "Constant", "Null");             }
             ;
 
 %%
