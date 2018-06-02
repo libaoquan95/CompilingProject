@@ -51,13 +51,13 @@ comment      ("//"[^\n]*)|("/*"[^\*/]*"\*/")
 "ReadInteger"  { return T_ReadInteger;     }
 "ReadLine"     { return T_ReadLine;        }
 
-"true"         { return T_BooleanConstant; }
-"false"        { return T_BooleanConstant; }
+"true"         { yylval = 1;            return T_BooleanConstant; }
+"false"        { yylval = 0;            return T_BooleanConstant; }
 
-{integer}      { return T_IntConstant;     }
-{double}       { return T_DoubleConstant;  }
-{string}       { return T_StringConstant;  }
-{identifier}   { return T_Identifier;      }
+{integer}      { yylval = atoi(yytext); return T_IntConstant;     }
+{double}       { yylval = atof(yytext); return T_DoubleConstant;  }
+{string}       { yylval = yytext;       return T_StringConstant;  }
+{identifier}   { yylval = yytext;       return T_Identifier;      }
 {whitespace}   { /* skip */                }
 {comment}      { /* skip */                }
 
@@ -74,4 +74,3 @@ void lex_error(char* msg, int line) {
 int yywrap(void) {
     return 1;
 }
-
