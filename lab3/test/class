@@ -1,0 +1,14 @@
+class c1{
+    int cpu;
+    void Crash(int numTimes){
+        int i;
+        for(i = 0; i < numTimes; i = i + 1)
+            Print("sad\n");
+    }
+}
+class c2 extends c1{
+    int mouse;
+    void Crash(int numTimes){
+        Print("ack\n");
+    }
+}
