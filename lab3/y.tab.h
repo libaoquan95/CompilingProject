@@ -159,6 +159,7 @@ union YYSTYPE
     // Expression 
     Expression        *expression;
 
+
 #line 163 "y.tab.h" /* yacc.c:1909  */
 };
 
@@ -167,6 +168,8 @@ typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_DECLARED 1
 #endif
 
+#include <list>
+#include "ast.h"
 
 extern YYSTYPE yylval;
 

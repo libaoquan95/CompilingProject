@@ -21,7 +21,7 @@ void yyerror(const char* msg) {
     char     *sval;
     double   dval;
     bool     bval;
-     /*
+
     // List
     list<Entity*>     *entityList;
     list<Expression*> *exprList;
@@ -41,7 +41,6 @@ void yyerror(const char* msg) {
 
     // Expression 
     Expression        *expression;
-   */
 }
 
 %token    T_Le                
@@ -73,7 +72,7 @@ void yyerror(const char* msg) {
 %token    T_ReadInteger       
 %token    T_ReadLine          
 %token    <ival>   T_IntConstant       
-%token    <sval>   T_DoubleConstant    
+%token    <dval>   T_DoubleConstant    
 %token    <sval>   T_StringConstant    
 %token    <sval>   T_Identifier        
 %token    <bval>   T_BooleanConstant
@@ -309,7 +308,7 @@ Constant    :   T_IntConstant           {
             |   T_DoubleConstant        {      
                                             //$$ = new DoubleConstant(atof($1));    
                                             printf("%15s -> %-15s |",  "Constant", "DoubleConstant");
-                                            printf("%15s -> %s \n",    "Constant", $1); 
+                                            printf("%15s -> %f \n",    "Constant", $1); 
                                         } 
             |   T_BooleanConstant       { 
                                             //$$ = new BooleanConstant($1);   
@@ -332,3 +331,4 @@ Constant    :   T_IntConstant           {
 int main() {
     return yyparse();
 }
+

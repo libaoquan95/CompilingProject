@@ -57,7 +57,7 @@ comment      ("//"[^\n]*)|("/*"[^\*/]*"\*/")
 "false"        { yylval.bval = 0;            return T_BooleanConstant; }
 
 {integer}      { yylval.ival = atoi(yytext); return T_IntConstant;     }
-{double}       { yylval.sval = yytext;       return T_DoubleConstant;  }
+{double}       { yylval.dval = atof(yytext); return T_DoubleConstant;  }
 {string}       { yylval.sval = yytext;       return T_StringConstant;  }
 {identifier}   { yylval.sval = yytext;       return T_Identifier;      }
 {whitespace}   { /* skip */                }
@@ -76,4 +76,5 @@ void lex_error(char* msg, int line) {
 int yywrap(void) {
     return 1;
 }
+
 
