@@ -6,28 +6,42 @@
 #include <list>
 #include "ast.h"
 
-extern int cur_line_num;
+extern int yylineno;
 int yylex();
 void yyerror(const char* msg) {
-    printf("ERROR: %s at line %d \n", msg, cur_line_num);
+    printf("ERROR: %s at line %d \n", msg, yylineno);
 }
 %}
 
 %start Program
 
 /*bison可以从这个定义中产生yylval的定义*/ 
-%union { 
-    int     integerConstant; 
-    int     boolConstant; 
-    const   char *stringConstant; 
-    double  doubleConstant; 
-    char    identifier[128]; 
-
-
+%union {
     int      ival;
     char     *sval;
     double   dval;
-    int      bval;
+    bool     bval;
+     /*
+    // List
+    list<Entity*>     *entityList;
+    list<Expression*> *exprList;
+    list<Statement*>  *stmtList;
+
+    // Entity
+    Entity            *entity;
+    ClassEntity       *classEntity;
+    FunctionEntity    *functionEntity;
+    VariableEntity    *variableEntity;
+
+    // Statement
+    Statement         *statement;
+
+    // Type
+    Type              *typeVal;
+
+    // Expression 
+    Expression        *expression;
+   */
 }
 
 %token    T_Le                
@@ -78,7 +92,35 @@ void yyerror(const char* msg) {
 %nonassoc T_ELSE
 %nonassoc T_IFX
 
-%type <sval> Constant
+%type <entityList>     Program 
+%type <variableEntity> VariableDecl
+%type <variableEntity> Variable
+%type <typeVal>        Type
+%type <entityList>     Formals
+%type <entityList>     VariableMore
+
+%type <functionEntity> FunctionDefn
+%type <classEntity>    ClassDefn
+%type <classEntity>    ExtendsQ
+%type <entityList>     Fieldlist
+%type <entity>         Field
+%type <statement>      StmtBlock
+%type <stmtList>       Stmtlist
+%type <statement>      Stmt
+%type <statement>      SimpleStmt
+%type <expression>     LValue
+%type <expression>     Call
+%type <exprList>       Actuals
+%type <entityList>     ExprMore
+%type <statement>      ForStmt
+%type <statement>      WhileStmt
+%type <statement>      IfStmt
+%type <statement>      ReturnStmt
+%type <statement>      BreakStmt
+%type <statement>      PrintStmt
+%type <expression>     BoolExpr
+%type <expression>     Expr
+%type <expression>     Constant
 
 
 %%
@@ -260,28 +302,28 @@ Expr        :   Constant                { printf("%15s -> %s \n",  "Expr", "Cons
 
 /* 常量 */            
 Constant    :   T_IntConstant           { 
-                                        printf("%15s -> %-15s |",  "Constant", "IntConstant");   
-                                        printf("%15s -> %d \n",    "Constant", $1);
-                                        $$ = $1;
+                                            //$$ = new IntegerConstant($1);
+                                            printf("%15s -> %-15s |",  "Constant", "IntConstant");   
+                                            printf("%15s -> %d \n",    "Constant", $1);
                                         } 
-            |   T_DoubleConstant        { 
-                                        printf("%15s -> %-15s |",  "Constant", "DoubleConstant");
-                                        printf("%15s -> %s \n",    "Constant", $1);      
-                                        $$ = atof($1);      
+            |   T_DoubleConstant        {      
+                                            //$$ = new DoubleConstant(atof($1));    
+                                            printf("%15s -> %-15s |",  "Constant", "DoubleConstant");
+                                            printf("%15s -> %s \n",    "Constant", $1); 
                                         } 
             |   T_BooleanConstant       { 
-                                        printf("%15s -> %-15s |",  "Constant", "BoolConstant"); 
-                                        printf("%15s -> %d \n",    "Constant", $1);
-                                        $$ = $1;   
+                                            //$$ = new BooleanConstant($1);   
+                                            printf("%15s -> %-15s |",  "Constant", "BoolConstant"); 
+                                            printf("%15s -> %d \n",    "Constant", $1);
                                         }  
             |   T_StringConstant        { 
-                                        printf("%15s -> %-15s |",  "Constant", "StringConstant"); 
-                                        printf("%15s -> %s \n",    "Constant", $1);
-                                        $$ = $1;   
+                                            //$$ = new StringConstant($1);   
+                                            printf("%15s -> %-15s |",  "Constant", "StringConstant"); 
+                                            printf("%15s -> %s \n",    "Constant", $1);
                                         } 
             |   T_Null                  { 
-                                        printf("%15s -> %s\n",   "Constant", "Null");
-                                        $$ = null;
+                                            //$$ = new NullConstant();
+                                            printf("%15s -> %s\n",   "Constant", "Null");
                                         }
             ;
 
@@ -290,4 +332,3 @@ Constant    :   T_IntConstant           {
 int main() {
     return yyparse();
 }
-

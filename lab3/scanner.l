@@ -2,6 +2,7 @@
 //#include "token.h"
 #include "y.tab.h"
 void lex_error(char* msg, int line);
+
 %}
 
 delim        [ \t]
@@ -17,9 +18,10 @@ integer      ([+|-]?{digit}+)|((0x|0X){digitH}+)
 double       [+|-]?{digit}+(\.{digit}+)?(E[+|-]?{digit}+)?
 comment      ("//"[^\n]*)|("/*"[^\*/]*"\*/")
 
+%option yylineno
 
 %%
-[\n]           { cur_line_num++;           }
+[\n]           { yylineno++;               }
 {operator}     { return yytext[0];         }   
 "<="           { return T_Le;              }
 ">="           { return T_Ge;              }
@@ -51,17 +53,17 @@ comment      ("//"[^\n]*)|("/*"[^\*/]*"\*/")
 "ReadInteger"  { return T_ReadInteger;     }
 "ReadLine"     { return T_ReadLine;        }
 
-"true"         { yylval = 1;            return T_BooleanConstant; }
-"false"        { yylval = 0;            return T_BooleanConstant; }
+"true"         { yylval.bval = 1;            return T_BooleanConstant; }
+"false"        { yylval.bval = 0;            return T_BooleanConstant; }
 
-{integer}      { yylval = atoi(yytext); return T_IntConstant;     }
-{double}       { yylval = yytext;       return T_DoubleConstant;  }
-{string}       { yylval = yytext;       return T_StringConstant;  }
-{identifier}   { yylval = yytext;       return T_Identifier;      }
+{integer}      { yylval.ival = atoi(yytext); return T_IntConstant;     }
+{double}       { yylval.sval = yytext;       return T_DoubleConstant;  }
+{string}       { yylval.sval = yytext;       return T_StringConstant;  }
+{identifier}   { yylval.sval = yytext;       return T_Identifier;      }
 {whitespace}   { /* skip */                }
 {comment}      { /* skip */                }
 
-.              { lex_error("Unrecognized character", cur_line_num);        }
+.              { lex_error("Unrecognized character", yylineno);   }
 <<EOF>>        { return 0;                 }
 
 
