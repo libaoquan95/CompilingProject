@@ -22,7 +22,6 @@ void yyerror(const char* msg) {
     double   dval;
     bool     bval;
 
-/*
     // List
     list<Entity*>     *entityList;
     list<Expression*> *exprList;
@@ -40,7 +39,6 @@ void yyerror(const char* msg) {
     // Type
     Type              *typeVal;
 
-*/
     // Expression 
     Expression        *expression;
 }
@@ -93,7 +91,6 @@ void yyerror(const char* msg) {
 %nonassoc T_ELSE
 %nonassoc T_IFX
 
-/*
 %type <entityList>     Program 
 %type <variableEntity> VariableDecl
 %type <variableEntity> Variable
@@ -122,8 +119,8 @@ void yyerror(const char* msg) {
 %type <statement>      PrintStmt
 %type <expression>     BoolExpr
 %type <expression>     Expr
-*/
 %type <expression>     Constant
+
 
 %%
 Program     :   ClassDefn               { printf("%15s -> %s \n", "Program", "ClassDefn");         } 
@@ -319,8 +316,7 @@ Constant    :   T_IntConstant           {
                                             printf("%15s -> %d \n",    "Constant", $1);
                                         }  
             |   T_StringConstant        { 
-                                            $$ = new StringConstant($1);
-                                            $$->print();   
+                                            $$ = new StringConstant($1);   
                                             printf("%15s -> %-15s |",  "Constant", "StringConstant"); 
                                             printf("%15s -> %s \n",    "Constant", $1);
                                         } 

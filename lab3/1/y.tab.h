@@ -141,7 +141,7 @@ union YYSTYPE
     char     *sval;
     double   dval;
     bool     bval;
-/*
+
     // List
     list<Entity*>     *entityList;
     list<Expression*> *exprList;
@@ -158,7 +158,6 @@ union YYSTYPE
 
     // Type
     Type              *typeVal;
-*/
 
     // Expression 
     Expression        *expression;
@@ -171,6 +170,7 @@ typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
+
 
 extern YYSTYPE yylval;
 
