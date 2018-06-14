@@ -15,8 +15,8 @@ Entity::Entity(const char* _name, Kind _kind)
 	:	name(_name),
 		kind(_kind)
 {
-	same_name = nullptr;
-	same_scope = nullptr;
+	same_name = NULL;
+	same_scope = NULL;
 	level_number = 0;
 	entity_number = ++entity_counter;
 }
@@ -36,7 +36,7 @@ EntityTable::EntityTable()
 {
   entity_counter = 0;
   level = 0;
-  scope_stack.push_front(nullptr);
+  scope_stack.push_front(NULL);
 }
 
 EntityTable::~EntityTable() {}
@@ -57,7 +57,7 @@ Entity* EntityTable::find_entity(const char *name, Kind kind, bool *current) {
 // 		printf(" '%s' exists\n", name);
 		// name already exists, search through the same stack
 		Entity* entity = name_table[name];
-		while (entity != nullptr){
+		while (entity != NULL){
 			if (entity->kind == kind){
 				*current = (entity->level_number == level);
 				return entity;
@@ -68,17 +68,17 @@ Entity* EntityTable::find_entity(const char *name, Kind kind, bool *current) {
 	}
 // 	printf(" '%s' not exists\n", name);
 	// not found
-	return nullptr;
+	return NULL;
 }
 
 void EntityTable::add_entity(Entity* entity){
 // 	printf("before add '%s'\n", entity->name);
 	if (name_table.find(entity->name) != name_table.end()){
-// 		printf(" %s not nullptr\n", entity->name);
+// 		printf(" %s not NULL\n", entity->name);
 		entity->same_name = name_table[entity->name];
 	} else {
-// 		printf(" %s nullptr\n", entity->name);
-		entity->same_name = nullptr;
+// 		printf(" %s NULL\n", entity->name);
+		entity->same_name = NULL;
 	}
 
 	name_table[entity->name] = entity;
@@ -101,7 +101,7 @@ void EntityTable::add_entity(Entity* entity){
 }
 
 void EntityTable::enter_block(void){
-	scope_stack.push_front(nullptr);
+	scope_stack.push_front(NULL);
 	++level;
 // 	printf(" Enter from level %d to %d\n", level-1, level);
 }
@@ -112,7 +112,7 @@ void EntityTable::leave_block(void){
 	}
 	Entity* entity = scope_stack.front();
 	// remove entity link in the current scope from the name_table
-	while (entity != nullptr){
+	while (entity != NULL){
 		Entity* next = entity->same_scope;
 		name_table[entity->name] = entity->same_name;
 		entity = next;
@@ -127,7 +127,7 @@ list<Entity*> EntityTable::defined_in_current_scope(void){
 	list<Entity*>* ret = new list<Entity*>();
 	if (!scope_stack.empty()){
 		Entity* entity = scope_stack.front();
-		while (entity != nullptr){
+		while (entity != NULL){
 			ret->push_front(entity);
 			entity = entity->same_scope;
 		}
@@ -141,7 +141,7 @@ void EntityTable::print_symbols_in_scope(void){
 	for (auto it = scope_stack.rbegin(); it != scope_stack.rend(); ++it){
 		printf("Level %d\n", i++);
 		Entity* entity = *it;
-		while (entity != nullptr){
+		while (entity != NULL){
 			printf("%s_%d: %d ", entity->name, entity->entity_number, entity->kind);
 			entity = entity->same_scope;
 		}

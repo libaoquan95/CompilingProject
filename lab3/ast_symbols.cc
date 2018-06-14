@@ -7,11 +7,9 @@
 using namespace std;
 extern EntityTable* global_symtab;
 
-////////////////////////////////
-//
-//     Class Entitites
-//
-////////////////////////////////
+/*
+* Class Entitites
+*/
 
 ClassEntity::ClassEntity(const char* _name, ClassEntity* _superclass, list<Entity*>* _class_members)
 	:	Entity::Entity(_name, CLASS_ENTITY),
@@ -49,7 +47,7 @@ void ClassEntity::print()
 //     Function Entities
 //
 ////////////////////////////////
-
+/*
 FunctionEntity::FunctionEntity(const char* _name, Type* _return_type, list<Entity*>* _formal_params, Statement* _function_body)
 	:	Entity::Entity(_name, FUNCTION_ENTITY),
 		return_type(_return_type),
@@ -99,3 +97,4 @@ void VariableEntity::print()
 	type->print();
 	cout << " " << name << endl;
 }
+*/

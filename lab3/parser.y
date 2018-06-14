@@ -6,11 +6,15 @@
 #include <list>
 #include "ast.h"
 
+extern char *yytext;
 extern int yylineno;
+
 int yylex();
 void yyerror(const char* msg) {
-    printf("ERROR: %s at line %d \n", msg, yylineno);
+	printf("\nError: (line: %d) %s encountered at %s\n", yylineno, msg, yytext);
 }
+
+EntityTable *global_symtab = new EntityTable();
 %}
 
 %start Program
@@ -22,8 +26,6 @@ void yyerror(const char* msg) {
     double   dval;
     bool     bval;
 
-/*
-    // List
     list<Entity*>     *entityList;
     list<Expression*> *exprList;
     list<Statement*>  *stmtList;
@@ -31,16 +33,15 @@ void yyerror(const char* msg) {
     // Entity
     Entity            *entity;
     ClassEntity       *classEntity;
-    FunctionEntity    *functionEntity;
-    VariableEntity    *variableEntity;
+//    FunctionEntity    *functionEntity;
+//    VariableEntity    *variableEntity;
 
     // Statement
     Statement         *statement;
 
     // Type
-    Type              *typeVal;
+//    Type              *typeVal;
 
-*/
     // Expression 
     Expression        *expression;
 }
@@ -93,15 +94,14 @@ void yyerror(const char* msg) {
 %nonassoc T_ELSE
 %nonassoc T_IFX
 
-/*
+
 %type <entityList>     Program 
-%type <variableEntity> VariableDecl
-%type <variableEntity> Variable
-%type <typeVal>        Type
+//%type <variableEntity> VariableDecl
+//%type <variableEntity> Variable
+//%type <typeVal>        Type
 %type <entityList>     Formals
 %type <entityList>     VariableMore
-
-%type <functionEntity> FunctionDefn
+//%type <functionEntity> FunctionDefn
 %type <classEntity>    ClassDefn
 %type <classEntity>    ExtendsQ
 %type <entityList>     Fieldlist
@@ -113,7 +113,7 @@ void yyerror(const char* msg) {
 %type <expression>     LValue
 %type <expression>     Call
 %type <exprList>       Actuals
-%type <entityList>     ExprMore
+%type <exprList>       ExprMore
 %type <statement>      ForStmt
 %type <statement>      WhileStmt
 %type <statement>      IfStmt
@@ -122,7 +122,6 @@ void yyerror(const char* msg) {
 %type <statement>      PrintStmt
 %type <expression>     BoolExpr
 %type <expression>     Expr
-*/
 %type <expression>     Constant
 
 %%
@@ -243,8 +242,15 @@ Actuals     :   ExprMore                { printf("%15s -> %s \n",  "Actuals", "E
             |   /* empty */             { printf("%15s -> %s \n",  "Actuals", "");                            } 
             ;
 
-ExprMore    :   Expr                    { printf("%15s -> %s \n",  "ExprMore", "Expr");                       } 
-            |   ExprMore ',' Expr       { printf("%15s -> %s \n",  "ExprMore", "ExprMore , Expr");            } 
+ExprMore    :   Expr                    { 
+                                            $$ = new list<Expression*>();
+                                            printf("%15s -> %s \n",  "ExprMore", "Expr");
+                                        } 
+            |   ExprMore ',' Expr       {
+                                            $$ = $1;
+                                            $$->push_back($3);
+                                            printf("%15s -> %s \n",  "ExprMore", "ExprMore , Expr");
+                                        } 
             ;
 
 ForStmt     :   T_For '(' SimpleStmt ';' BoolExpr ';' SimpleStmt ')' Stmt   
@@ -256,48 +262,147 @@ WhileStmt   :   T_While '(' BoolExpr ')' Stmt
             ;
 
 IfStmt      :   T_If '(' BoolExpr ')' Stmt %prec T_IFX
-                                        { printf("%15s -> %s \n",  "IfStmt", "If (BoolExpr ) Stmt %prec T_IFX "); }
+                                        {
+                                            printf("%15s -> %s \n",  "IfStmt", "If (BoolExpr ) Stmt %prec T_IFX ");
+                                        }
             |   T_If '(' BoolExpr ')' Stmt T_Else Stmt
-                                        { printf("%15s -> %s \n",  "IfStmt", "If (BoolExpr ) Stmt T_Else Stmt "); }
+                                        {
+                                            printf("%15s -> %s \n",  "IfStmt", "If (BoolExpr ) Stmt T_Else Stmt ");
+                                        }
             ;
 
-ReturnStmt  :   T_Return                { printf("%15s -> %s \n",  "ReturnStmt", "Return");                   } 
-            |   T_Return Expr           { printf("%15s -> %s \n",  "ReturnStmt", "Return Expr ");             } 
+ReturnStmt  :   T_Return                {
+                                            $$ = new ReturnStatement(new NullExpression());
+				                            $$->level_number = global_symtab->level;
+                                            printf("%15s -> %s \n",  "ReturnStmt", "Return");
+                                        } 
+            |   T_Return Expr           {
+                                            $$ = new ReturnStatement($2);
+				                            $$->level_number = global_symtab->level;
+                                            printf("%15s -> %s \n",  "ReturnStmt", "Return Expr ");
+                                        } 
             ;
             
-BreakStmt   :   T_Break                 { printf("%15s -> %s \n",  "ReturnStmt", "Break");                    }  
+BreakStmt   :   T_Break                 {
+                                            $$ = new BreakStatement();
+				                            $$->level_number = global_symtab->level;
+                                            printf("%15s -> %s \n",  "BreakStmt", "Break");
+                                        }  
             ;
 
-PrintStmt   :   T_Print '(' ExprMore ')'{ printf("%15s -> %s \n",  "PrintStmt", "Print (ExprMore) ");         } 
+PrintStmt   :   T_Print '(' ExprMore ')'{
+                                            $$ = new PrintStatement($3);
+                                            $$->level_number = global_symtab->level;
+                                            printf("%15s -> %s \n",  "PrintStmt", "Print (ExprMore) ");
+                                        } 
             ;
 
-BoolExpr    :   Expr                    { printf("%15s -> %s \n",  "BoolExpr", "Expr");          } 
+BoolExpr    :   Expr                    { 
+                                            $$ = $1;
+                                            printf("%15s -> %s \n",  "BoolExpr", "Expr");
+                                        } 
             ;
 
-Expr        :   Constant                { printf("%15s -> %s \n",  "Expr", "Constant");          } 
-            |   LValue                  { printf("%15s -> %s \n",  "Expr", "LValue");            } 
-            |   T_This                  { printf("%15s -> %s \n",  "Expr", "This");              } 
-            |   Call                    { printf("%15s -> %s \n",  "Expr", "Call");              } 
-            |   '(' Expr')'             { printf("%15s -> %s \n",  "Expr", "( Expr) ");          } 
-            |   Expr '+' Expr           { printf("%15s -> %s \n",  "Expr", "Expr + Expr ");      } 
-            |   Expr '-' Expr           { printf("%15s -> %s \n",  "Expr", "Expr - Expr ");      } 
-            |   Expr '*' Expr           { printf("%15s -> %s \n",  "Expr", "Expr * Expr ");      } 
-            |   Expr '/' Expr           { printf("%15s -> %s \n",  "Expr", "Expr /Expr ");       } 
-            |   Expr '%' Expr           { printf("%15s -> %s \n",  "Expr", "Expr % Expr ");      } 
-            |   '-' Expr                { printf("%15s -> %s \n",  "Expr", "- Expr ");           } 
-            |   Expr '<' Expr           { printf("%15s -> %s \n",  "Expr", "Expr < Expr ");      } 
-            |   Expr T_Le Expr          { printf("%15s -> %s \n",  "Expr", "LessEqual Expr ");   } 
-            |   Expr '>' Expr           { printf("%15s -> %s \n",  "Expr", "Expr >Expr ");       } 
-            |   Expr T_Ge Expr          { printf("%15s -> %s \n",  "Expr", "GreaterEqual");      } 
-            |   Expr T_Eq Expr          { printf("%15s -> %s \n",  "Expr", "Equal Expr ");       } 
-            |   Expr T_Ne Expr          { printf("%15s -> %s \n",  "Expr", "NotEqual Expr ");    } 
-            |   Expr T_And Expr         { printf("%15s -> %s \n",  "Expr", "And Expr ");         } 
-            |   Expr T_Or Expr          { printf("%15s -> %s \n",  "Expr", "Or Expr ");          } 
-            |   '!' Expr                { printf("%15s -> %s \n",  "Expr", "! Expr ");           } 
-            |   T_ReadInteger '(' ')'   { printf("%15s -> %s \n",  "Expr", "Expr ReadInteger ( ) "); } 
-            |   T_ReadLine '(' ')'      { printf("%15s -> %s \n",  "Expr", "Expr ReadLine ( ) ");    } 
+Expr        :   Constant                { 
+                                            $$  =$1;
+                                            printf("%15s -> %s \n",  "Expr", "Constant");
+                                        } 
+            |   LValue                  { 
+                                            $$ = $1;
+                                            printf("%15s -> %s \n",  "Expr", "LValue");
+                                        } 
+            |   T_This                  {
+                                            $$ = new ThisExpression();
+                                            printf("%15s -> %s \n",  "Expr", "This");
+                                        } 
+            |   Call                    {
+                                            $$ = $1;
+                                            printf("%15s -> %s \n",  "Expr", "Call");
+                                        } 
+            |   '(' Expr')'             { 
+                                            $$ = $2;
+                                            printf("%15s -> %s \n",  "Expr", "( Expr) ");
+                                        } 
+            |   Expr '+' Expr           { 
+                                            $$ = new BinaryExpression(ADD, $1, $3);
+                                            printf("%15s -> %s \n",  "Expr", "Expr + Expr ");
+                                        } 
+            |   Expr '-' Expr           { 
+                                            $$ = new BinaryExpression(SUB, $1, $3);
+                                            printf("%15s -> %s \n",  "Expr", "Expr - Expr ");
+                                        } 
+            |   Expr '*' Expr           { 
+                                            $$ = new BinaryExpression(MUL, $1, $3);
+                                            printf("%15s -> %s \n",  "Expr", "Expr * Expr ");
+                                        } 
+            |   Expr '/' Expr           { 
+                                            $$ = new BinaryExpression(DIV, $1, $3);
+                                            printf("%15s -> %s \n",  "Expr", "Expr /Expr ");
+                                        } 
+            |   Expr '%' Expr           { 
+                                            $$ = new BinaryExpression(MOD, $1, $3);
+                                            printf("%15s -> %s \n",  "Expr", "Expr % Expr ");
+                                        } 
+            |   '-' Expr                { 
+                                            $$ = new UnaryExpression(UMINUS, $2);
+                                            printf("%15s -> %s \n",  "Expr", "- Expr ");
+                                        } 
+            |   Expr '<' Expr           { 
+                                            $$ = new BinaryExpression(LT, $1, $3);
+                                            printf("%15s -> %s \n",  "Expr", "Expr < Expr ");
+                                        } 
+            |   Expr T_Le Expr          { 
+                                            $$ = new BinaryExpression(LE, $1, $3);
+                                            printf("%15s -> %s \n",  "Expr", "LessEqual Expr ");
+                                        } 
+            |   Expr '>' Expr           {
+                                            $$ = new BinaryExpression(GT, $1, $3);
+                                            printf("%15s -> %s \n",  "Expr", "Expr >Expr ");
+                                        } 
+            |   Expr T_Ge Expr          {
+                                            $$ = new BinaryExpression(GE, $1, $3);
+                                            printf("%15s -> %s \n",  "Expr", "GreaterEqual");
+                                        } 
+            |   Expr T_Eq Expr          {
+                                            $$ = new BinaryExpression(EQ, $1, $3);
+                                            printf("%15s -> %s \n",  "Expr", "Equal Expr ");
+                                        } 
+            |   Expr T_Ne Expr          { 
+                                            $$ = new BinaryExpression(NEQ, $1, $3);
+                                            printf("%15s -> %s \n",  "Expr", "NotEqual Expr ");
+                                        } 
+            |   Expr T_And Expr         {
+                                            $$ = new BinaryExpression(AND, $1, $3);
+                                            printf("%15s -> %s \n",  "Expr", "And Expr ");
+                                        } 
+            |   Expr T_Or Expr          {
+                                            $$ = new BinaryExpression(OR, $1, $3);
+                                            printf("%15s -> %s \n",  "Expr", "Or Expr ");
+                                        } 
+            |   '!' Expr                {
+                                            $$ = new UnaryExpression(NOT, $2);
+                                            printf("%15s -> %s \n",  "Expr", "! Expr ");
+                                        } 
+            |   T_ReadInteger '(' ')'   {
+                                            $$ = new ReadIntegerExpression();
+                                            printf("%15s -> %s \n",  "Expr", "Expr ReadInteger ( ) ");
+                                        } 
+            |   T_ReadLine '(' ')'      {
+                                            $$ = new ReadLineExpression();
+                                            printf("%15s -> %s \n",  "Expr", "Expr ReadLine ( ) ");
+                                        } 
             |   T_New T_Identifier '(' ')'  
-                                        { printf("%15s -> %s \n",  "Expr", "New Identifier ( ) ");   }
+                                        { 
+                                            bool current;
+                                            Entity* entity = global_symtab->find_entity($2, CLASS_ENTITY, &current);
+                                            ClassEntity* classEntity = dynamic_cast<ClassEntity *>(entity);
+                                            if (!classEntity){
+                                                yyerror("Undeclared class");
+                                                printf("  Undeclared class name: %s\n", $2);
+                                            }
+                                            $$ = new NewInstance($2, classEntity);
+                                            printf("%15s -> %s \n",  "Expr", "New Identifier ( ) ");
+                                        }
             |   T_NewArray '(' Expr ',' Type ')' 
                                         { printf("%15s -> %s \n",  "Expr", "NewArray ( Expr , Type )");}
             ;
@@ -320,7 +425,6 @@ Constant    :   T_IntConstant           {
                                         }  
             |   T_StringConstant        { 
                                             $$ = new StringConstant($1);
-                                            $$->print();   
                                             printf("%15s -> %-15s |",  "Constant", "StringConstant"); 
                                             printf("%15s -> %s \n",    "Constant", $1);
                                         } 

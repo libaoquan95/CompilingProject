@@ -141,7 +141,6 @@ union YYSTYPE
     char     *sval;
     double   dval;
     bool     bval;
-/*
     // List
     list<Entity*>     *entityList;
     list<Expression*> *exprList;
@@ -150,15 +149,14 @@ union YYSTYPE
     // Entity
     Entity            *entity;
     ClassEntity       *classEntity;
-    FunctionEntity    *functionEntity;
-    VariableEntity    *variableEntity;
+//    FunctionEntity    *functionEntity;
+//    VariableEntity    *variableEntity;
 
     // Statement
     Statement         *statement;
 
     // Type
-    Type              *typeVal;
-*/
+//    Type              *typeVal;
 
     // Expression 
     Expression        *expression;
