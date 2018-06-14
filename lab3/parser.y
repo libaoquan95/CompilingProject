@@ -15,6 +15,8 @@ void yyerror(const char* msg) {
 }
 
 EntityTable *global_symtab = new EntityTable();
+list<Entity*>* toplevel = new list<Entity*>();
+ClassEntity* objectclass = new ClassEntity("Object", (ClassEntity*)NULL, new list<Entity*>());
 %}
 
 %start Program
@@ -33,14 +35,14 @@ EntityTable *global_symtab = new EntityTable();
     // Entity
     Entity            *entity;
     ClassEntity       *classEntity;
-//    FunctionEntity    *functionEntity;
-//    VariableEntity    *variableEntity;
+    FunctionEntity    *functionEntity;
+    VariableEntity    *variableEntity;
 
     // Statement
     Statement         *statement;
 
     // Type
-//    Type              *typeVal;
+    Type              *typeVal;
 
     // Expression 
     Expression        *expression;
@@ -96,12 +98,12 @@ EntityTable *global_symtab = new EntityTable();
 
 
 %type <entityList>     Program 
-//%type <variableEntity> VariableDecl
-//%type <variableEntity> Variable
-//%type <typeVal>        Type
+%type <variableEntity> VariableDecl
+%type <variableEntity> Variable
+%type <typeVal>        Type
 %type <entityList>     Formals
 %type <entityList>     VariableMore
-//%type <functionEntity> FunctionDefn
+%type <functionEntity> FunctionDefn
 %type <classEntity>    ClassDefn
 %type <classEntity>    ExtendsQ
 %type <entityList>     Fieldlist
@@ -125,121 +127,360 @@ EntityTable *global_symtab = new EntityTable();
 %type <expression>     Constant
 
 %%
-Program     :   ClassDefn               { printf("%15s -> %s \n", "Program", "ClassDefn");         } 
-            |   Program ClassDefn       { printf("%15s -> %s \n", "Program", "Program ClassDefn"); }
-            |   error                   { yyerror("Program");                                      }
+Program     :   ClassDefn               {
+                                            $$ = toplevel;
+				                            $$->push_back($1);
+                                            printf("%15s -> %s \n", "Program", "ClassDefn");
+                                        } 
+            |   Program ClassDefn       {
+                                            $$ = $1;
+				                            $$->push_back($2);
+                                            printf("%15s -> %s \n", "Program", "Program ClassDefn");
+                                        }
+            |   error                   {
+                                            yyerror("Program");
+                                        }
             ; 
 
-VariableDecl:   Variable ';'            { printf("%15s -> %s \n",  "VariableDecl", "Variable ;");  } 
-            |   error                   { yyerror("VariableDecl");                                 }
+VariableDecl:   Variable ';'            {
+                                            $$ = $1;
+                                            printf("%15s -> %s \n",  "VariableDecl", "Variable ;");
+                                        } 
+            |   error                   {
+                                            yyerror("VariableDecl");
+                                        }
             ;
 
 /* 变量定义 */
-Variable    :   Type T_Identifier       { 
-                                          printf("%15s -> %-15s |",  "Variable", "Type Identifier");  
-                                          printf("%15s -> %s %s \n",  "Variable", "Type", $2);  
+Variable    :   Type T_Identifier       {
+                                            bool current;
+                                            //printf("before into find_entity\n");
+                                            Entity* entity = global_symtab->find_entity($2, VARIABLE_ENTITY, &current);
+                                            //printf("after  into find_entity\n");
+                                            VariableEntity* variable = dynamic_cast<VariableEntity*>(entity);
+                                            if (variable && current) {
+                                                yyerror("Redefinition of variable name");
+                                                printf("Redefined variable name: %s\n", $2);
+                                            }
+                                            $$ = new VariableEntity($2, $1);
+                                            printf("%15s -> %-15s |",  "Variable", "Type Identifier");  
+                                            printf("%15s -> %s %s \n",  "Variable", "Type", $2);  
                                         } 
-            |   error                   { yyerror("Variable");                                     }
+            |   error                   {
+                                            yyerror("Variable");
+                                        }
             ;
 
 /* 变量类型 */
-Type        :   T_Int                   { printf("%15s -> %s \n",  "Type", "Int");       } 
-            |   T_Double                { printf("%15s -> %s \n",  "Type", "Double");    } 
-            |   T_Boolean               { printf("%15s -> %s \n",  "Type", "Bool");      } 
-            |   T_String                { printf("%15s -> %s \n",  "Type", "String");    } 
-            |   T_Void                  { printf("%15s -> %s \n",  "Type", "Void");      } 
-            |   T_Class T_Identifier    { 
-                                          printf("%15s -> %-15s |","Type", "Identifier");  
-                                          printf("%15s -> %s %s\n", "Type", "calss", $2);
+Type        :   T_Int                   {
+                                            $$ = new IntType();
+                                            printf("%15s -> %s \n",  "Type", "Int");
                                         } 
-            |   Type '[' ']'            { printf("%15s -> %s \n",  "Type", "Type[]");    } 
-            |   error                   { yyerror("Type");                               }
+            |   T_Double                {
+                                            $$ = new DoubleType();
+                                            printf("%15s -> %s \n",  "Type", "Double");
+                                        } 
+            |   T_Boolean               {
+                                            $$ = new BooleanType();
+                                            printf("%15s -> %s \n",  "Type", "Bool");
+                                        } 
+            |   T_String                {
+                                            $$ = new StringType();
+                                            printf("%15s -> %s \n",  "Type", "String");
+                                        } 
+            |   T_Void                  {
+                                            $$ = new VoidType();
+                                            printf("%15s -> %s \n",  "Type", "Void");
+                                        } 
+            |   T_Class T_Identifier    {
+                                            bool current;
+                                            Entity* entity = global_symtab->find_entity($2, CLASS_ENTITY, &current);
+                                            ClassEntity* classEntity = dynamic_cast<ClassEntity*>(entity);
+                                            if (!classEntity) {
+                                                yyerror("Undefined class");
+                                                printf("Undefined class name: %s\n", $2);
+                                                $$ = new ErrorType();
+                                            } else {
+                                                $$ = new InstanceType(classEntity);
+                                            }
+                                            /*$$ = new ClassType($2);*/
+                                            printf("%15s -> %-15s |","Type", "Identifier");  
+                                            printf("%15s -> %s %s\n", "Type", "calss", $2);
+                                        } 
+            |   Type '[' ']'            {
+                                            $$ = new ArrayType($1);
+                                            printf("%15s -> %s \n",  "Type", "Type[]");
+                                        } 
+            |   error                   {
+                                            yyerror("Type");
+                                        }
             ;
 
 /* 函数参数列表 */
-Formals     :   VariableMore            { printf("%15s -> %s \n",  "Formals", "VariableMore,"); } 
-            |   /* empty */             { printf("%15s -> %s \n",  "Formals", " ");             } 
-            ;
-
-VariableMore:   Variable                { printf("%15s -> %s \n",  "VariableMore", "Variable");           } 
-            |   VariableMore ',' Variable
-                                        { printf("%15s -> %s \n",  "Formals", "VariableMore , Variable"); } 
-            ;
-
-/* 函数定义 */            
-FunctionDecl:   Type T_Identifier '(' Formals ')' ';'    { 
-                                        printf("%15s -> %-15s |",  "FunctionDecl", "Identifier(Formals)"); 
-                                        printf("%15s -> %s \n",    "FunctionDecl", $2);           
+Formals     :   VariableMore            {
+                                            $$ = $1;
+                                            printf("%15s -> %s \n",  "Formals", "VariableMore,");
+                                        } 
+            |   /* empty */             {
+                                            $$ = new list<Entity*>();
+                                            printf("%15s -> %s \n",  "Formals", " ");
                                         } 
             ;
 
-/* 函数体 */             
+VariableMore:   Variable                { 
+                                            $$ = new list<Entity*>();
+				                            $$->push_back($1);
+                                            printf("%15s -> %s \n",  "VariableMore", "Variable");
+                                        } 
+            |   VariableMore ',' Variable
+                                        { 
+                                            $$ = $1;
+                                            $$->push_back($3);
+                                            printf("%15s -> %s \n",  "Formals", "VariableMore , Variable");
+                                        } 
+            ;
+
+/* 函数定义 */            
+FunctionDecl:   Type T_Identifier '(' Formals ')' ';'    
+                                        { 
+                                            printf("%15s -> %-15s |",  "FunctionDecl", "Identifier(Formals)"); 
+                                            printf("%15s -> %s \n",    "FunctionDecl", $2);           
+                                        } 
+            ;
+
+/* 函数体 */
+/*             
+FunctionDefn:   Type T_Identifier       {
+                                            $<functionEntity>$ = new FunctionEntity($2, $1, nullptr, nullptr);
+					                        global_symtab->enter_block();
+                                        }
+                '(' Formals ')' StmtBlock 
+                                        {
+                                            $$ = $<functionEntity>3;
+                                            $$->formal_params = $5;
+                                            $$->function_body = $7;
+                                            global_symtab->leave_block();
+                                            //$$ = new FunctionEntity($2, $1, $4, $6);
+                                            printf("%15s -> %-15s \n",  "FunctionDefn", "Identifier(Formals) StmtBlock");
+                                        } 
+            ; 
+*/
 FunctionDefn:   Type T_Identifier '(' Formals ')' StmtBlock 
-                                       { printf("%15s -> %-15s \n",  "FunctionDefn", "Identifier(Formals) StmtBlock"); } 
-            ;
-
+                                        {
+                                            printf("%15s -> %-15s \n",  "FunctionDefn", "Identifier(Formals) StmtBlock");
+                                        }
+            ; 
+            
 /* 类定义 */  
-ClassDefn   :   T_Class T_Identifier ExtendsQ '{' Fieldlist '}'   
-                                        { printf("Class Identifier ExtendsQ { Fieldlist } \n");           } 
+ClassDefn   :   T_Class T_Identifier    {
+                                            bool current;
+                                            Entity* entity = global_symtab->find_entity($2, CLASS_ENTITY, &current);
+                                            ClassEntity* classEntity = dynamic_cast<ClassEntity*>(entity);
+                                            if (classEntity){
+                                                yyerror("Redefinition of class"); 
+                                                printf("Redefined class name: %s\n", $2);
+                                            }
+                                            $<classEntity>$ = new ClassEntity($2, nullptr, nullptr);
+                                            global_symtab->enter_block();
+                                        }
+                ExtendsQ '{' Fieldlist '}'   
+                                        {
+                                            $$ = $<classEntity>3;
+                                            $$->superclass = $4;
+                                            $$->class_members = $6;
+                                            global_symtab->leave_block();
+                                            /*$$ = new ClassEntity($2, $3, $5);*/
+                                           printf("Class Identifier ExtendsQ { Fieldlist } \n");
+                                        } 
             ;
 
-ExtendsQ    :   T_Extends T_Identifier  { printf("%15s -> %s \n",  "ExtendsQ", "T_Extends T_Identifier"); } 
-            |   /* empty */             { printf("%15s -> %s \n",  "ExtendsQ", " ");                      } 
+ExtendsQ    :   T_Extends T_Identifier  {
+                                            bool current;
+                                            Entity* entity = global_symtab->find_entity($2, CLASS_ENTITY, &current);
+                                            ClassEntity* superclass = dynamic_cast<ClassEntity*>(entity);
+                                            if (!superclass){
+                                                yyerror("Undeclared superclass");
+                                                printf("Undeclared superclass name: %s\n", $2);
+                                            }
+                                            $$ = superclass;
+                                            printf("%15s -> %s \n",  "ExtendsQ", "T_Extends T_Identifier");
+                                        } 
+            |   /* empty */             {
+                                            $$ = objectclass;
+                                            printf("%15s -> %s \n",  "ExtendsQ", " ");
+                                        } 
             ;
 
-Fieldlist   :   Fieldlist Field         { printf("%15s -> %s \n",  "Fieldlist", "Fieldlist Field");       } 
-            |   /* empty */             { printf("%15s -> %s \n",  "Fieldlist", " ");                     }
-            |   error                   { yyerror("Fieldlist");                                           }
+Fieldlist   :   Fieldlist Field         {
+                                            $$ = $1;
+				                            $$->push_back($2);
+                                            printf("%15s -> %s \n",  "Fieldlist", "Fieldlist Field");
+                                        } 
+            |   /* empty */             {
+                                            $$ = new list<Entity*>();
+                                            printf("%15s -> %s \n",  "Fieldlist", " ");
+                                        }
+            |   error                   {
+                                            yyerror("Fieldlist");
+                                        }
             ;
 
-Field       :   VariableDecl            { printf("%15s -> %s \n",  "Field", "VariableDecl");     } 
-            |   FunctionDecl            { printf("%15s -> %s \n",  "Field", "FunctionDecl");     } 
-            |   FunctionDefn            { printf("%15s -> %s \n",  "Field", "FunctionDefn");     } 
+Field       :   VariableDecl            {
+                                            $$ = $1;
+                                            printf("%15s -> %s \n",  "Field", "VariableDecl");
+                                        } 
+            |   FunctionDecl            {
+                                            printf("%15s -> %s \n",  "Field", "FunctionDecl");
+                                        } 
+            |   FunctionDefn            {
+                                            $$ = $1;
+                                            printf("%15s -> %s \n",  "Field", "FunctionDefn");
+                                        } 
             ;
 
 /* 语句块 */            
-StmtBlock   :   '{' Stmtlist '}'        { printf("%15s -> %s \n",  "StmtBlock", ":{ Stmtlist } ");} 
-            |   error                   { yyerror("StmtBlock");                                   }
+StmtBlock   :   /* entry block */       {
+                                            global_symtab->enter_block();
+                                        }
+                '{' Stmtlist '}'        {
+                                            $$ = new BlockStatement($3);
+                                            $$->level_number = global_symtab->level;
+                                            global_symtab->leave_block();
+                                            printf("%15s -> %s \n",  "StmtBlock", ":{ Stmtlist } ");
+                                        } 
+            |   error                   {
+                                            yyerror("StmtBlock");
+                                        }
             ;
 
-Stmtlist    :   Stmtlist Stmt           { printf("%15s -> %s \n",  "Stmtlist", "Stmtlist Stmt");  } 
-            |   /* empty */             { printf("%15s -> %s \n",  "Stmtlist", " ");              }
+Stmtlist    :   Stmtlist Stmt           {
+                                            $$ = $1;
+                                            $$->push_back($2);
+                                            printf("%15s -> %s \n",  "Stmtlist", "Stmtlist Stmt");
+                                        } 
+            |   /* empty */             {
+                                            $$ = new list<Statement*>();
+                                            printf("%15s -> %s \n",  "Stmtlist", " ");
+                                        }
             ; 
 
-Stmt        :   VariableDecl            { printf("%15s -> %s \n",  "Stmt", "VariableDecl");       } 
-            |   SimpleStmt ';'          { printf("%15s -> %s \n",  "Stmt", "SimpleStmt ;");       } 
-            |   IfStmt                  { printf("%15s -> %s \n",  "Stmt", "IfStmt");             } 
-            |   WhileStmt               { printf("%15s -> %s \n",  "Stmt", "WhileStmt ");         } 
-            |   ForStmt                 { printf("%15s -> %s \n",  "Stmt", "ForStmt ");           } 
-            |   BreakStmt ';'           { printf("%15s -> %s \n",  "Stmt", "BreakStmt ;");        } 
-            |   ReturnStmt ';'          { printf("%15s -> %s \n",  "Stmt", "ReturnStmt ;");       } 
-            |   PrintStmt ';'           { printf("%15s -> %s \n",  "Stmt", "PrintStmt ;");        } 
-            |   StmtBlock               { printf("%15s -> %s \n",  "Stmt", "StmtBlock ");         }
+Stmt        :   VariableDecl            {
+                                            $$ = new DeclStatement($1);
+				                            $$->level_number = global_symtab->level;
+                                            printf("%15s -> %s \n",  "Stmt", "VariableDecl");
+                                        } 
+            |   SimpleStmt ';'          {
+                                            $$ = $1;
+                                            printf("%15s -> %s \n",  "Stmt", "SimpleStmt ;");
+                                        } 
+            |   IfStmt                  {
+                                            $$ = $1;
+                                            printf("%15s -> %s \n",  "Stmt", "IfStmt");
+                                        } 
+            |   WhileStmt               {
+                                            $$ = $1;
+                                            printf("%15s -> %s \n",  "Stmt", "WhileStmt ");
+                                        } 
+            |   ForStmt                 {
+                                            $$ = $1;
+                                            printf("%15s -> %s \n",  "Stmt", "ForStmt ");
+                                        } 
+            |   BreakStmt ';'           {
+                                            $$ = $1;
+                                            printf("%15s -> %s \n",  "Stmt", "BreakStmt ;");
+                                        } 
+            |   ReturnStmt ';'          {
+                                            $$ = $1;
+                                            printf("%15s -> %s \n",  "Stmt", "ReturnStmt ;");
+                                        } 
+            |   PrintStmt ';'           {
+                                            $$ = $1;
+                                            printf("%15s -> %s \n",  "Stmt", "PrintStmt ;");
+                                        } 
+            |   StmtBlock               {
+                                            $$ = $1;
+                                            printf("%15s -> %s \n",  "Stmt", "StmtBlock ");
+                                        }
             ;
 
 /* 语句 */
-SimpleStmt  :   LValue '=' Expr         { printf("%15s -> %s \n",  "SimpleStmt", "LValue = Expr ");} 
-            |   Call                    { printf("%15s -> %s \n",  "SimpleStmt", "Call ");         } 
-            |   /* empty */             { printf("%15s -> %s \n",  "SimpleStmt", " ");             } 
-            |   error                   { yyerror("SimpleStmt");                                   }
+SimpleStmt  :   LValue '=' Expr         {
+                                            $$ = new AssignStatement($1, $3);
+                                            printf("%15s -> %s \n",  "SimpleStmt", "LValue = Expr ");
+                                        } 
+            |   Call                    {
+                                            $$ = new CallStatement($1);
+                                            printf("%15s -> %s \n",  "SimpleStmt", "Call ");
+                                        } 
+            |   /* empty */             {
+                                            $$ = new NullStatement();
+                                            printf("%15s -> %s \n",  "SimpleStmt", " ");
+                                        } 
+            |   error                   {
+                                            yyerror("SimpleStmt");
+                                        }
             ;
 
 /* 左值 */            
-LValue      :   Expr '.' T_Identifier   { printf("%15s -> %s \n",  "LValue", "Expr . T_Identifier");} 
-            |   T_Identifier            { printf("%15s -> %s \n",  "LValue", "T_Identifier");       }
-            |   Expr '[' Expr ']'       { printf("%15s -> %s \n",  "LValue", "Expr [ Expr ] ");     } 
-            |   error                   { yyerror("LValue");                                        }
+LValue      :   Expr '.' T_Identifier   {
+                                            $$ = new MemberAccess($1, $3);
+                                            printf("%15s -> %s \n",  "LValue", "Expr . T_Identifier");
+                                        } 
+            |   T_Identifier            {
+                                            bool current;
+                                            Entity* entity = global_symtab->find_entity($1, VARIABLE_ENTITY, &current);
+                                            if (entity && current){
+                                                // local variable
+                                                VariableEntity* local = dynamic_cast<VariableEntity*>(entity);
+                                                $$ = new IdExpression(local);
+                                            } 
+                                            else if (entity = global_symtab->find_entity($1, CLASS_ENTITY, &current)){
+                                                // class variable
+                                                ClassEntity* classEntity = dynamic_cast<ClassEntity*>(entity);
+                                                $$ = new IdExpression(classEntity);
+                                            } 
+                                            else if (entity = global_symtab->find_entity($1, VARIABLE_ENTITY, &current)){
+                                                // outter variable
+                                                VariableEntity* variable = dynamic_cast<VariableEntity*>(entity);
+                                                $$ = new IdExpression(variable);
+                                            } 
+                                            else {
+                                                yyerror("Undefined variable");
+                                                printf("Undefined variable name: %s\n", $1);
+                                                $$ = new MemberAccess(new ThisExpression(), $1);
+                                            }
+                                            printf("%15s -> %s \n",  "LValue", "T_Identifier");
+                                        }
+            |   Expr '[' Expr ']'       {
+                                            $$ = new ArrayAccess($1, $3);
+                                            printf("%15s -> %s \n",  "LValue", "Expr [ Expr ] ");
+                                        } 
+            |   error                   { 
+                                            yyerror("LValue");
+                                        }
             ;
 
 /* 调用 */            
 Call        :   Expr '.' T_Identifier '(' Actuals ')'                
-                                        { printf("%15s -> %s \n", "Call", "Expr . T_Identifier ( Actuals ) ");} 
+                                        {
+                                            $$ = new FunctionInvocation($1, $3, $5);
+                                            printf("%15s -> %s \n", "Call", "Expr . T_Identifier ( Actuals ) ");
+                                        } 
             |   T_Identifier '(' Actuals ')'
-                                        { printf("%15s -> %s \n", "Call", "T_Identifier ( Actuals ) ");       } 
+                                        {
+                                            $$ = new FunctionInvocation(new NullExpression(), $1, $3);
+                                            printf("%15s -> %s \n", "Call", "T_Identifier ( Actuals ) ");
+                                        } 
             ;
 
-Actuals     :   ExprMore                { printf("%15s -> %s \n",  "Actuals", "ExprMore");                    } 
-            |   /* empty */             { printf("%15s -> %s \n",  "Actuals", "");                            } 
+Actuals     :   ExprMore                {
+                                            $$ = $1;
+                                            printf("%15s -> %s \n",  "Actuals", "ExprMore");
+                                        } 
+            |   /* empty */             {
+                                            $$ = new list<Expression*>();
+                                            printf("%15s -> %s \n",  "Actuals", "");
+                                        } 
             ;
 
 ExprMore    :   Expr                    { 
@@ -254,19 +495,31 @@ ExprMore    :   Expr                    {
             ;
 
 ForStmt     :   T_For '(' SimpleStmt ';' BoolExpr ';' SimpleStmt ')' Stmt   
-                                        { printf("%15s -> %s \n",  "ForStmt", "For (SimpleStmt BoolExpr SimpleStmt ) Stmt ");} 
+                                        {
+                                            $$ = new ForStatement($3, $5, $7, $9);
+				                            $$->level_number = global_symtab->level;
+                                            printf("%15s -> %s \n",  "ForStmt", "For (SimpleStmt BoolExpr SimpleStmt ) Stmt ");
+                                        } 
             ;
 
 WhileStmt   :   T_While '(' BoolExpr ')' Stmt
-                                        { printf("%15s -> %s \n",  "WhileStmt", "While ( BoolExpr ) Stmt ");  } 
+                                        {
+                                            $$ = new WhileStatement($3, $5);
+				                            $$->level_number = global_symtab->level;
+                                            printf("%15s -> %s \n",  "WhileStmt", "While ( BoolExpr ) Stmt ");
+                                        } 
             ;
 
 IfStmt      :   T_If '(' BoolExpr ')' Stmt %prec T_IFX
                                         {
+                                            $$ = new IfStatement($3, $5, new NullStatement());
+                                            $$->level_number = global_symtab->level;
                                             printf("%15s -> %s \n",  "IfStmt", "If (BoolExpr ) Stmt %prec T_IFX ");
                                         }
             |   T_If '(' BoolExpr ')' Stmt T_Else Stmt
                                         {
+                                            $$ = new IfStatement($3, $5, $7);
+                                            $$->level_number = global_symtab->level;
                                             printf("%15s -> %s \n",  "IfStmt", "If (BoolExpr ) Stmt T_Else Stmt ");
                                         }
             ;

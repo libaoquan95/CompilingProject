@@ -19,13 +19,12 @@ public:
 
 	virtual void add_class_member(Entity* e);
 	virtual void print();
-	//virtual void typecheck();
+	virtual void typecheck();
 
 	ClassEntity* superclass;
 	list<Entity*>* class_members;
 };
 
-/*
 class VariableEntity: public Entity {
 public:
 	VariableEntity(	const char* _name,
@@ -52,6 +51,5 @@ public:
 	list<Entity*>* formal_params;
 	Statement* function_body;
 };
-*/
 
 #endif

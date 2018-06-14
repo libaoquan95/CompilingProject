@@ -149,14 +149,14 @@ union YYSTYPE
     // Entity
     Entity            *entity;
     ClassEntity       *classEntity;
-//    FunctionEntity    *functionEntity;
-//    VariableEntity    *variableEntity;
+    FunctionEntity    *functionEntity;
+    VariableEntity    *variableEntity;
 
     // Statement
     Statement         *statement;
 
     // Type
-//    Type              *typeVal;
+    Type              *typeVal;
 
     // Expression 
     Expression        *expression;

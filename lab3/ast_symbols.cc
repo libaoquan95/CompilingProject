@@ -42,12 +42,9 @@ void ClassEntity::print()
 	cout << "}" << endl;
 }
 
-////////////////////////////////
-//
-//     Function Entities
-//
-////////////////////////////////
 /*
+* Function Entities
+*/
 FunctionEntity::FunctionEntity(const char* _name, Type* _return_type, list<Entity*>* _formal_params, Statement* _function_body)
 	:	Entity::Entity(_name, FUNCTION_ENTITY),
 		return_type(_return_type),
@@ -74,12 +71,9 @@ void FunctionEntity::print()
 	function_body->print();
 }
 
-////////////////////////////////
-//
-//    Variable Entities
-//
-////////////////////////////////
-
+/*
+* Variable Entities
+*/
 VariableEntity::VariableEntity(const char* _name, Type* _type)
 	:	Entity::Entity(_name, VARIABLE_ENTITY),
 		type(_type)
@@ -97,4 +91,3 @@ void VariableEntity::print()
 	type->print();
 	cout << " " << name << endl;
 }
-*/
