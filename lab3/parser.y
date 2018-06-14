@@ -690,6 +690,11 @@ Constant    :   T_IntConstant           {
 %%
 
 int main() {
-    return yyparse();
+    yyparse();
+    cout << endl;
+    for (auto it = toplevel->begin(); it != toplevel->end(); ++it){
+        (*it)->print();
+    }
+    return 0;
 }
 

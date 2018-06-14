@@ -4,7 +4,7 @@ class cla {
         a = a - 2;
         b = 2.3;
         c = "abcdefg";
+        d = New e();
     }
-
    int fun2();
 }

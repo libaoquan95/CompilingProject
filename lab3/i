@@ -1,4 +1,5 @@
 g++ ast.h ast.cc symbols.h symbols.cc ast_print.cc ast_symbols.h ast_symbols.cc y.tab.h lex.yy.c parser.tab.c -o parser -std=c++11
 
-
+flex scanner.l
+bison paeser.y
 g++  symbols.cc ast_symbols.cc ast.cc ast_print.cc types.cc ast_typecheck.cc lex.yy.c parser.tab.c -o parser -std=c++11
