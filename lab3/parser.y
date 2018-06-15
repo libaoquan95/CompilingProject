@@ -344,7 +344,7 @@ StmtBlock   :   /* entry block */       {
                                         }
                 '{' Stmtlist '}'        {
                                             $$ = new BlockStatement($3);
-                                            $$->level_number = global_symtab->level;
+                                            $$->level_number = global_symtab->level - 1;
                                             global_symtab->leave_block();
                                             printf("%15s -> %s \n",  "StmtBlock", "{ Stmtlist } ");
                                         } 
@@ -406,14 +406,17 @@ Stmt        :   VariableDecl            {
 /* 语句 */
 SimpleStmt  :   LValue '=' Expr         {
                                             $$ = new AssignStatement($1, $3);
+                                            $$->level_number = global_symtab->level;
                                             printf("%15s -> %s \n",  "SimpleStmt", "LValue = Expr ");
                                         } 
             |   Call                    {
                                             $$ = new CallStatement($1);
+                                            $$->level_number = global_symtab->level;
                                             printf("%15s -> %s \n",  "SimpleStmt", "Call ");
                                         } 
             |   /* empty */             {
                                             $$ = new NullStatement();
+                                            $$->level_number = global_symtab->level;
                                             printf("%15s -> %s \n",  "SimpleStmt", " ");
                                         } 
             |   error                   {
@@ -697,3 +700,4 @@ int main() {
     }
     return 0;
 }
+

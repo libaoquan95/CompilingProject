@@ -12,44 +12,44 @@ class Type;
 
 class ClassEntity: public Entity {
 public:
-	ClassEntity(const char* _name,
-				ClassEntity* _superclass,
-				list<Entity*>* _class_members);
-	virtual ~ClassEntity();
+    ClassEntity(const char* _name,
+                ClassEntity* _superclass,
+                list<Entity*>* _class_members);
+    virtual ~ClassEntity();
 
-	virtual void add_class_member(Entity* e);
-	virtual void print();
-	virtual void typecheck();
+    virtual void add_class_member(Entity* e);
+    virtual void print();
+    virtual void typecheck();
 
-	ClassEntity* superclass;
-	list<Entity*>* class_members;
+    ClassEntity* superclass;
+    list<Entity*>* class_members;
 };
 
 class VariableEntity: public Entity {
 public:
-	VariableEntity(	const char* _name,
-					Type* _type);
-	virtual ~VariableEntity();
+    VariableEntity(    const char* _name,
+                    Type* _type);
+    virtual ~VariableEntity();
 
-	virtual void print();
+    virtual void print();
 
-	Type* type;
+    Type* type;
 };
 
 class FunctionEntity: public Entity {
 public:
-	FunctionEntity(const char* _name,
-				 Type* _return_type,
-				 list<Entity*>* _formal_params,
-				 Statement* _function_body);
-	virtual ~FunctionEntity();
+    FunctionEntity(const char* _name,
+                 Type* _return_type,
+                 list<Entity*>* _formal_params,
+                 Statement* _function_body);
+    virtual ~FunctionEntity();
 
-	virtual void print();
-	virtual void typecheck();
+    virtual void print();
+    virtual void typecheck();
 
-	Type* return_type;
-	list<Entity*>* formal_params;
-	Statement* function_body;
+    Type* return_type;
+    list<Entity*>* formal_params;
+    Statement* function_body;
 };
 
 #endif

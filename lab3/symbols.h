@@ -11,47 +11,47 @@ using namespace std;
 using namespace __gnu_cxx;
 
 enum Kind {
-	CLASS_ENTITY,
-	VARIABLE_ENTITY,
-	FUNCTION_ENTITY
+    CLASS_ENTITY,
+    VARIABLE_ENTITY,
+    FUNCTION_ENTITY
 };
 
 class Entity {
 public:
-	Entity();
-	Entity(const char* _name, Kind _kind);
-	virtual ~Entity();
+    Entity();
+    Entity(const char* _name, Kind _kind);
+    virtual ~Entity();
 
-	virtual void print();
+    virtual void print();
 
-	const char* name;
-	Kind kind;
-	Entity* same_name;
-	Entity* same_scope;
-	int level_number;
-	int entity_number;
+    const char* name;
+    Kind kind;
+    Entity* same_name;
+    Entity* same_scope;
+    int level_number;
+    int entity_number;
 
-	int lineno;
+    int lineno;
 };
 
 struct eqstr {
-	bool operator()(const char* const& s1, const char* const& s2) const {
-		return strcmp(s1, s2) == 0;
-	}
+    bool operator()(const char* const& s1, const char* const& s2) const {
+        return strcmp(s1, s2) == 0;
+    }
 };
 
 struct cmpstr {
-	bool operator()(const char* const& s1, const char* const& s2) const {
-		return strcmp(s1, s2) < 0;
-	}
+    bool operator()(const char* const& s1, const char* const& s2) const {
+        return strcmp(s1, s2) < 0;
+    }
 };
 
 class EntityTable{
 public:
-	EntityTable();
-	virtual ~EntityTable();
+    EntityTable();
+    virtual ~EntityTable();
 
-	//API:
+    //API:
     virtual Entity* find_entity(const char *name, Kind kind, bool *current);
     virtual void add_entity(Entity* entity);
 
@@ -64,9 +64,9 @@ public:
     int level;
     list<Entity*> scope_stack;
 
-	//hash_map< const char *, Entity*, eqstr > name_table_;
-	//unordered_map<const char*, Entity*, hash<const char*>, eqstr> name_table;
-	map<const char*, Entity*, cmpstr> name_table;
+    //hash_map< const char *, Entity*, eqstr > name_table_;
+    //unordered_map<const char*, Entity*, hash<const char*>, eqstr> name_table;
+    map<const char*, Entity*, cmpstr> name_table;
 
     void print_name_table_entries();
 };

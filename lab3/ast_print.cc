@@ -3,303 +3,306 @@
 
 // Print method for IntType
 void IntType::print() {
-	cout << "int";
+    cout << "int";
 }
 
 // Print method for DoubleType
 void DoubleType::print() {
-	cout << "double";
+    cout << "double";
 }
 
 // Print method for BooleanType
 void BooleanType::print() {
-	cout << "boolean";
+    cout << "boolean";
 }
 
 // Print method for StringType
 void StringType::print() {
-	cout << "string";
+    cout << "string";
 }
 
 // Print method for VoidType
 void VoidType::print() {
-	cout << "void";
+    cout << "void";
 }
 
 // Print method for ClassType
 void ClassType::print() {
-	classtype->print();
+    classtype->print();
 }
 
 // Print method for InstanceType
 void InstanceType::print() {
-	cout << "class " << classtype->name;
+    cout << "class " << classtype->name;
 }
 
 // Print method for ErrorType
 void ErrorType::print() {
-	cout << "error";
+    cout << "error";
 }
 
 // Print method for ArrayType
 void ArrayType::print() {
-	elementtype->print();
-	cout << "[" << dimension << "]";
+    elementtype->print();
+    cout << "[" << dimension << "]";
 }
 
 // Print method for UniverseType
 void UniverseType::print() {
-	cout << "Universe";
+    cout << "Universe";
 }
 
 // Print method for Universe
 void NullType::print() {
-	cout << "Null";
+    cout << "Null";
 }
 
 // Print method for BinaryExpression
 void BinaryExpression::print() {
-	cout << "(";
-	lhs->print();
-	switch(binary_operator) {
-		case ADD:    cout << " + "; break;
-		case SUB:    cout << " - "; break;
-		case MUL:    cout << " * "; break;
-		case DIV:    cout << " / "; break;
-		case MOD:    cout << " % "; break;
-		case EQ:     cout << " == ";  break;
-		case NEQ:    cout << " != "; break;
-		case LT:     cout << " < ";  break;
-		case LE:     cout << " <= "; break;
-		case GT:     cout << " > ";  break;
-		case GE:     cout << " >= "; break;
-		case AND:    cout << " && "; break;
-		case OR:     cout << " || ";  break;
-	}
-	rhs->print();
-	cout << ")";
+    cout << "BinaryExpression: (";
+    lhs->print();
+    switch(binary_operator) {
+        case ADD:    cout << " + "; break;
+        case SUB:    cout << " - "; break;
+        case MUL:    cout << " * "; break;
+        case DIV:    cout << " / "; break;
+        case MOD:    cout << " % "; break;
+        case EQ:     cout << " == ";  break;
+        case NEQ:    cout << " != "; break;
+        case LT:     cout << " < ";  break;
+        case LE:     cout << " <= "; break;
+        case GT:     cout << " > ";  break;
+        case GE:     cout << " >= "; break;
+        case AND:    cout << " && "; break;
+        case OR:     cout << " || ";  break;
+    }
+    rhs->print();
+    cout << ")";
 }
 
 // Print method for UnaryExpression
 void UnaryExpression::print() {
-	cout << "(";
-	switch(unary_operator) {
-		case NOT:    cout << " !"; break;
-		case UMINUS: cout << " -"; break;
-	}
-	arg->print();
-	cout << ")";
+    cout << "UnaryExpression: (";
+    switch(unary_operator) {
+        case NOT:    cout << " !"; break;
+        case UMINUS: cout << " -"; break;
+    }
+    arg->print();
+    cout << ")";
 }
 
 // Print method for ThisExpression
 void ThisExpression::print() {
-	cout << "this";
+    cout << "this";
 }
 
 // Print method for ReadIntegerExpression
 void ReadIntegerExpression::print() {
-	cout << "ReadInteger()";
+    cout << "ReadIntegerExpression: ReadInteger()";
 }
 
 // Print method for NewInstance
 void NewInstance::print() {
-	cout << "new " << class_name;
+    cout << "NewInstance: new " << class_name;
 }
 
 // Print method for ReadLineExpression
 void ReadLineExpression::print() {
-	cout << "ReadLine()";
+    cout << "ReadLineExpression: ReadLine()";
 }
 
 // Print method for NullExpression
 void NullExpression::print() {
-	cout << "NULL";
+    cout << "NullExpression: NULL";
 }
 
 // Print method for MethodInvocation
 void FunctionInvocation::print() {
-	if (base == NULL) {
-		cout << name;
-	} else {
-		base->print();
-		cout << "." << name;
-	}
-	cout << "( ";
-	for(auto it = args->begin(); it != args->end(); ++it) {
-		if (it == args->begin()){
-			(*it)->print();
-		} else {
-			cout << ", ";
-			(*it)->print();
-		}
-	}
-	cout << ")";
+    if (base == NULL) {
+        cout << name;
+    } else {
+        base->print();
+        cout << "." << name;
+    }
+    cout << "( ";
+    for(auto it = args->begin(); it != args->end(); ++it) {
+        if (it == args->begin()){
+            (*it)->print();
+        } else {
+            cout << ", ";
+            (*it)->print();
+        }
+    }
+    cout << ")";
 }
 
 // Print method for MemberAccess
 void MemberAccess::print() {
-	if (base == NULL){
-		cout << name;
-	} else {
-		base->print();
-		cout << "." << name;
-	}
+    if (base == NULL){
+        cout << name;
+    } else {
+        base->print();
+        cout << "." << name;
+    }
 }
 
 // Print method for ArrayAccess
 void ArrayAccess::print() {
-	base->print();
-	cout << "[";
-	idx->print();
-	cout << "]";
+    base->print();
+    cout << "[";
+    idx->print();
+    cout << "]";
 }
 
 // Print method for IdExpression
 void IdExpression::print() {
-	if (id != NULL)
-		cout << id->name;
-	else
-		cout << "UndefinedID";
+    if (id != NULL)
+        cout << id->name;
+    else
+        cout << "UndefinedID";
 }
 
 // Print method for AssignStatement
 void AssignStatement::print() {
-	printf("%*s", level_number*2, "");
-	lhs->print();
-	cout << " = ";
-	rhs->print();
-	cout << ";" << endl;
+    printf("%*s", level_number*2, "");
+	cout << "Assign: ";
+    lhs->print();
+    cout << " = ";
+    rhs->print();
+    cout << ";" << endl;
 }
 
 // Print method for CallStatement
 void CallStatement::print() {
-	printf("%*s", level_number*2, "");
-	exprs->print();
-	cout << ";" << endl;
+    printf("%*s", level_number*2, "");
+	cout << "Call: ";
+    exprs->print();
+    cout << ";" << endl;
 }
 
 // Print method for DeclStatement
 void DeclStatement::print() {
-	printf("%*s", level_number*2, "");
-	var_list->print();
-	//cout << ";"<< endl;
+    printf("%*s", level_number*2, "");
+    var_list->print();
+    //cout << ";"<< endl;
 }
 
 // Print method for ExprStatement
 void ExprStatement::print() {
-	printf("%*s", level_number*2, "");
-	expr->print();
-	cout << ";" << endl;
+    printf("%*s", level_number*2, "");
+    expr->print();
+    cout << ";" << endl;
 }
 
 // Print method for BlockStatement
 void BlockStatement::print() {
-	printf("%*s", level_number*2, "");
-	cout << "{" << endl;
-	// for(auto it = decl_list->begin(); it != decl_list->end(); ++it)
-	// 	(*it)->print();
-	for(auto it = stmt_list->begin(); it != stmt_list->end(); ++it) {
-		(*it)->print();
-	}
-	printf("%*s", level_number*2, "");
-	cout << "}" << endl;
+    printf("%*s", level_number*2, "");
+    cout << "{" << endl;
+    // for(auto it = decl_list->begin(); it != decl_list->end(); ++it)
+    //     (*it)->print();
+    for(auto it = stmt_list->begin(); it != stmt_list->end(); ++it) {
+        (*it)->print();
+    }
+    printf("%*s", level_number*2, "");
+    cout << "}" << endl;
 }
 
 // Print method for ForStatement
 void ForStatement::print() {
-	printf("%*s", level_number*2, "");
-	cout << "for (";
-	if (init != NULL)
-		init->print();
-	cout << ";";
-	guard->print();
-	cout << ";";
-	if (update != NULL)
-		update->print();
-	cout << ")" << endl;
-	body->print();
+    printf("%*s", level_number*2, "");
+    cout << "for (";
+    if (init != NULL)
+        init->print();
+    cout << ";";
+    guard->print();
+    cout << ";";
+    if (update != NULL)
+        update->print();
+    cout << ")" << endl;
+    body->print();
 }
 
 // Print method for WhileStatement
 void WhileStatement::print() {
-	printf("%*s", level_number*2, "");
-	cout << "while (";
-	expr->print();
-	cout << ")" << endl;
-	body->print();
+    printf("%*s", level_number*2, "");
+    cout << "while (";
+    expr->print();
+    cout << ")" << endl;
+    body->print();
 }
 
 // Print method for IfStatement
 void IfStatement::print() {
-	printf("%*s", level_number*2, "");
-	cout << "if (";
-	expr->print();
-	cout << ")" << endl;
-	thenpart->print();
-	printf("%*s", level_number*2, "");
-	cout << "else" << endl;
-	if (elsepart == NULL)
-		cout << "empty" << endl;
-	else
-		elsepart->print();
+    printf("%*s", level_number*2, "");
+    cout << "if (";
+    expr->print();
+    cout << ")" << endl;
+    thenpart->print();
+    printf("%*s", level_number*2, "");
+    cout << "else" << endl;
+    if (elsepart == NULL)
+        cout << "empty" << endl;
+    else
+        elsepart->print();
 }
 
 // Print method for ReturnStatement
 void ReturnStatement::print() {
-	printf("%*s", level_number*2, "");
-	cout << "return ";
-	if (expr != NULL)
-		expr->print();
-	cout << ";" << endl;
+    printf("%*s", level_number*2, "");
+    cout << "return ";
+    if (expr != NULL)
+        expr->print();
+    cout << ";" << endl;
 }
 
 // Print method for BreakStatement
 void BreakStatement::print() {
-	printf("%*s", level_number*2, "");
-	cout << "break;" << endl;
+    printf("%*s", level_number*2, "");
+    cout << "break;" << endl;
 }
 
 // Print method for PrintStatement
 void PrintStatement::print() {
-	printf("%*s", level_number*2, "");
-	cout << "Print(";
-	for (auto it = exprs->begin(); it != exprs->end(); ++it){
-		if (it == exprs->begin())
-			(*it)->print();
-		else {
-			cout << ",";
-			(*it)->print();
-		}
-	}
-	cout << ");" << endl;
+    printf("%*s", level_number*2, "");
+    cout << "Print(";
+    for (auto it = exprs->begin(); it != exprs->end(); ++it){
+        if (it == exprs->begin())
+            (*it)->print();
+        else {
+            cout << ",";
+            (*it)->print();
+        }
+    }
+    cout << ");" << endl;
 }
 
 void NullStatement::print() {
-	printf("%*s", level_number*2, "");
-	cout << "null";
+    printf("%*s", level_number*2, "");
+    cout << "null";
 }
 
 // Print method for IntegerConstant
 void IntegerConstant::print() {
-	cout << value;
+    cout <<"int: " << value ;
 }
 
 // Print method for DoubleConstant
 void DoubleConstant::print() {
-	cout << value;
+    cout <<"double: " << value;
 }
 
 // Print method for BooleanConstant
 void BooleanConstant::print() {
-	cout << value;
+    cout <<"bool: " << value;
 }
 
 // Print method for StringConstant
 void StringConstant::print() {
-	cout << "\"" << value << "\"";
+    cout  <<"string: "<< "\"" << value << "\"";
 }
 
 // Print method for NullConstant
 void NullConstant::print() {
-	cout << "null";
+    cout << "null";
 }
+

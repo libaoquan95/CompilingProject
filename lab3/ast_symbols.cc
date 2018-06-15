@@ -30,7 +30,7 @@ void ClassEntity::print()
     printf("%*s", level_number*2, "");
     cout << "class " << name;
     if (superclass != nullptr) {
-        cout << "extends " << superclass->name;
+        cout << " extends " << superclass->name;
     }
     printf(" {  ");
     cout << "// Has " << class_members->size() << " members" << endl;
@@ -60,7 +60,7 @@ void FunctionEntity::print()
     printf("%*s", level_number*2, "");
     cout << "function: ";
     return_type->print();
-    cout << " " << name << "( " << endl;
+    cout << " " << name << "( ";
 
     for (auto it = formal_params->begin(); it != formal_params->end(); ++it) {
         (*it)->print();
@@ -90,3 +90,4 @@ void VariableEntity::print()
     type->print();
     cout << " " << name << endl;
 }
+

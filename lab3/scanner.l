@@ -58,8 +58,8 @@ comment      ("//"[^\n]*)|("/*"[^\*/]*"\*/")
 
 {integer}      { yylval.ival = atoi(yytext); return T_IntConstant;     }
 {double}       { yylval.dval = atof(yytext); return T_DoubleConstant;  }
-{string}       { yylval.sval = yytext;       return T_StringConstant;  }
-{identifier}   { yylval.sval = yytext;       return T_Identifier;      }
+{string}       { yylval.sval = strdup(yytext);       return T_StringConstant;  }
+{identifier}   { yylval.sval = strdup(yytext);       return T_Identifier;      }
 {whitespace}   { /* skip */                }
 {comment}      { /* skip */                }
 
