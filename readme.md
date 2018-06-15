@@ -28,6 +28,6 @@ $ ./parser < test/test
 $ cd lab3
 $ flex scanner.l
 $ bison parser.y
-$ g++ symbols.cc ast_symbols.cc ast.cc ast_print.cc types.cc ast_typecheck.cc lex.yy.c parser.tab.c -o parser -std=c++11
+$ g++ symbols.cc ast_symbols.cc ast.cc ast_print.cc lex.yy.c parser.tab.c -o parser -std=c++11
 $ ./parser < test/test
 ```
