@@ -271,6 +271,7 @@ Type* BinaryExpression::typeinfer()
 	}
 }
 
+/*
 Type* AssignExpression::typeinfer()
 {
 	Type* lhs_type = this->lhs->typeinfer();
@@ -286,6 +287,7 @@ Type* AssignExpression::typeinfer()
 	}
 	return rhs_type;
 }
+*/
 
 Type* ArrayAccess::typeinfer()
 {
@@ -452,6 +454,7 @@ Type* UnaryExpression::typeinfer()
 	}
 }
 
+/*
 Type* NewArrayInstance::typeinfer()
 {
 	int dimension = this->type->dimension;
@@ -461,12 +464,14 @@ Type* NewArrayInstance::typeinfer()
 	}
 	return ret_type;
 }
+*/
 
 Type* NewInstance::typeinfer()
 {
 	return new InstanceType(classEntity);
 }
 
+/*
 Type* InstanceofExpr::typeinfer(){
 	return null_type;
 }
@@ -474,6 +479,7 @@ Type* InstanceofExpr::typeinfer(){
 Type* TranslateExpr::typeinfer(){
 	return null_type;
 }
+*/
 
 Type* ThisExpression::typeinfer()
 {

@@ -19,7 +19,7 @@ public:
 
     virtual void add_class_member(Entity* e);
     virtual void print();
-    virtual void typecheck();
+    //virtual void typecheck();
 
     ClassEntity* superclass;
     list<Entity*>* class_members;
@@ -45,7 +45,7 @@ public:
     virtual ~FunctionEntity();
 
     virtual void print();
-    virtual void typecheck();
+    //virtual void typecheck();
 
     Type* return_type;
     list<Entity*>* formal_params;
