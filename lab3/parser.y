@@ -11,7 +11,7 @@ extern int yylineno;
 
 int yylex();
 void yyerror(const char* msg) {
-	printf("\nError: (line: %d) %s encountered at %s\n", yylineno, msg, yytext);
+    printf("\nError: (line: %d) %s encountered at %s\n", yylineno, msg, yytext);
 }
 
 EntityTable *global_symtab = new EntityTable();
@@ -163,7 +163,7 @@ Variable    :   Type T_Identifier       {
                                             else
                                             {
                                                 $$ = new VariableEntity($2, $1);
-                                            }cout << "----"<< entity <<"----";
+                                            }
                                             //
                                             printf("%15s -> %-15s |",  "Variable", "Type Identifier");  
                                             printf("%15s -> %s %s \n",  "Variable", "Type", $2);  
@@ -448,7 +448,7 @@ LValue      :   Expr '.' T_Identifier   {
                                                 yyerror("Undefined variable");
                                                 printf("Undefined variable name: %s\n", $1);
                                                 $$ = new MemberAccess(new ThisExpression(), $1);
-                                            }cout << "---"<< entity <<"----";
+                                            }
                                             printf("%15s -> %s \n",  "LValue", "T_Identifier");
                                         }
             |   Expr '[' Expr ']'       {

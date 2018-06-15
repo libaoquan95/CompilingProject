@@ -1,10 +1,30 @@
+class cla1{}
+
 class cla {
-    int a;
-    int b;
-    int fun1(int a, int b) {
-        //int c = a + b;
-        return c;
+    int i1;
+    bool b1;
+    string s1;
+    double d1;
+
+    void init() {
+        i1 = 1;
+        b1 = false;
+        s1 = "a string";
+        d1 = 1.23;
+
+        if (i1 == 1) {
+           i1 = 3;
+        }
+
+        while (b1) {
+            if (b1 != true) {
+                i1 = 4;
+                break;
+            }
+            else {
+                i1 = 5;
+            }
+        }
+        return;
     }
 }
-
-class cla {}
