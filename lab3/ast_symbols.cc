@@ -30,9 +30,9 @@ void ClassEntity::print()
 	printf("%*s", level_number*2, "");
 	cout << "class " << name;
 	if (superclass != nullptr) {
-		cout << " extends " << superclass->name;
+		cout << "extends " << superclass->name;
 	}
-	printf(" {\n");
+	printf(" {  ");
 	printf("%*s", level_number*2, "");
 	cout << "// Has " << class_members->size() << " members" << endl;
 	for (auto it = class_members->begin(); it != class_members->end(); ++it) {

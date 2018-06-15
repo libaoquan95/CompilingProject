@@ -113,7 +113,7 @@ void ReadLineExpression::print() {
 
 // Print method for NullExpression
 void NullExpression::print() {
-	cout << "null";
+	cout << "NULL";
 }
 
 // Print method for MethodInvocation
@@ -198,8 +198,9 @@ void BlockStatement::print() {
 	cout << "{" << endl;
 	// for(auto it = decl_list->begin(); it != decl_list->end(); ++it)
 	// 	(*it)->print();
-	for(auto it = stmt_list->begin(); it != stmt_list->end(); ++it)
+	for(auto it = stmt_list->begin(); it != stmt_list->end(); ++it) {
 		(*it)->print();
+	}
 	printf("%*s", level_number*2, "");
 	cout << "}" << endl;
 }

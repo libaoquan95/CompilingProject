@@ -129,16 +129,16 @@ ClassEntity* objectclass = new ClassEntity("Object", (ClassEntity*)NULL, new lis
 %%
 Program     :   ClassDefn               {
                                             $$ = toplevel;
-				                            $$->push_back($1);
+                                            $$->push_back($1);
                                             printf("%15s -> %s \n", "Program", "ClassDefn");
                                         } 
             |   Program ClassDefn       {
                                             $$ = $1;
-				                            $$->push_back($2);
+                                            $$->push_back($2);
                                             printf("%15s -> %s \n", "Program", "Program ClassDefn");
                                         }
             |   error                   {
-                                            yyerror("Program");
+                                            yyerror("Program should bagin with Class");
                                         }
             ; 
 
@@ -147,27 +147,29 @@ VariableDecl:   Variable ';'            {
                                             printf("%15s -> %s \n",  "VariableDecl", "Variable ;");
                                         } 
             |   error                   {
-                                            yyerror("VariableDecl");
+                                            yyerror("one line only defined one variable");
                                         }
             ;
 
 /* 变量定义 */
 Variable    :   Type T_Identifier       {
                                             bool current;
-                                            //printf("before into find_entity\n");
                                             Entity* entity = global_symtab->find_entity($2, VARIABLE_ENTITY, &current);
-                                            //printf("after  into find_entity\n");
                                             VariableEntity* variable = dynamic_cast<VariableEntity*>(entity);
                                             if (variable && current) {
                                                 yyerror("Redefinition of variable name");
                                                 printf("Redefined variable name: %s\n", $2);
                                             }
-                                            $$ = new VariableEntity($2, $1);
+                                            else
+                                            {
+                                                $$ = new VariableEntity($2, $1);
+                                            }cout << "----"<< entity <<"----";
+                                            //
                                             printf("%15s -> %-15s |",  "Variable", "Type Identifier");  
                                             printf("%15s -> %s %s \n",  "Variable", "Type", $2);  
                                         } 
             |   error                   {
-                                            yyerror("Variable");
+                                            yyerror("variable defined illegal");
                                         }
             ;
 
@@ -203,7 +205,6 @@ Type        :   T_Int                   {
                                             } else {
                                                 $$ = new InstanceType(classEntity);
                                             }
-                                            /*$$ = new ClassType($2);*/
                                             printf("%15s -> %-15s |","Type", "Identifier");  
                                             printf("%15s -> %s %s\n", "Type", "calss", $2);
                                         } 
@@ -212,7 +213,7 @@ Type        :   T_Int                   {
                                             printf("%15s -> %s \n",  "Type", "Type[]");
                                         } 
             |   error                   {
-                                            yyerror("Type");
+                                            yyerror("type illegal");
                                         }
             ;
 
@@ -229,7 +230,7 @@ Formals     :   VariableMore            {
 
 VariableMore:   Variable                { 
                                             $$ = new list<Entity*>();
-				                            $$->push_back($1);
+                                            $$->push_back($1);
                                             printf("%15s -> %s \n",  "VariableMore", "Variable");
                                         } 
             |   VariableMore ',' Variable
@@ -240,19 +241,19 @@ VariableMore:   Variable                {
                                         } 
             ;
 
-/* 函数定义 */            
+/* 函数定义             
 FunctionDecl:   Type T_Identifier '(' Formals ')' ';'    
                                         { 
                                             printf("%15s -> %-15s |",  "FunctionDecl", "Identifier(Formals)"); 
                                             printf("%15s -> %s \n",    "FunctionDecl", $2);           
                                         } 
             ;
+*/
 
-/* 函数体 */
-/*             
+/* 函数体 */      
 FunctionDefn:   Type T_Identifier       {
                                             $<functionEntity>$ = new FunctionEntity($2, $1, nullptr, nullptr);
-					                        global_symtab->enter_block();
+                                            global_symtab->enter_block();
                                         }
                 '(' Formals ')' StmtBlock 
                                         {
@@ -260,16 +261,16 @@ FunctionDefn:   Type T_Identifier       {
                                             $$->formal_params = $5;
                                             $$->function_body = $7;
                                             global_symtab->leave_block();
-                                            //$$ = new FunctionEntity($2, $1, $4, $6);
                                             printf("%15s -> %-15s \n",  "FunctionDefn", "Identifier(Formals) StmtBlock");
                                         } 
             ; 
-*/
+/*       
 FunctionDefn:   Type T_Identifier '(' Formals ')' StmtBlock 
                                         {
                                             printf("%15s -> %-15s \n",  "FunctionDefn", "Identifier(Formals) StmtBlock");
                                         }
             ; 
+*/
             
 /* 类定义 */  
 ClassDefn   :   T_Class T_Identifier    {
@@ -289,8 +290,7 @@ ClassDefn   :   T_Class T_Identifier    {
                                             $$->superclass = $4;
                                             $$->class_members = $6;
                                             global_symtab->leave_block();
-                                            /*$$ = new ClassEntity($2, $3, $5);*/
-                                           printf("Class Identifier ExtendsQ { Fieldlist } \n");
+                                            printf("Class Identifier ExtendsQ { Fieldlist } \n");
                                         } 
             ;
 
@@ -313,7 +313,7 @@ ExtendsQ    :   T_Extends T_Identifier  {
 
 Fieldlist   :   Fieldlist Field         {
                                             $$ = $1;
-				                            $$->push_back($2);
+                                            $$->push_back($2);
                                             printf("%15s -> %s \n",  "Fieldlist", "Fieldlist Field");
                                         } 
             |   /* empty */             {
@@ -329,9 +329,9 @@ Field       :   VariableDecl            {
                                             $$ = $1;
                                             printf("%15s -> %s \n",  "Field", "VariableDecl");
                                         } 
-            |   FunctionDecl            {
+            /*|   FunctionDecl            {
                                             printf("%15s -> %s \n",  "Field", "FunctionDecl");
-                                        } 
+                                        }*/ 
             |   FunctionDefn            {
                                             $$ = $1;
                                             printf("%15s -> %s \n",  "Field", "FunctionDefn");
@@ -346,7 +346,7 @@ StmtBlock   :   /* entry block */       {
                                             $$ = new BlockStatement($3);
                                             $$->level_number = global_symtab->level;
                                             global_symtab->leave_block();
-                                            printf("%15s -> %s \n",  "StmtBlock", ":{ Stmtlist } ");
+                                            printf("%15s -> %s \n",  "StmtBlock", "{ Stmtlist } ");
                                         } 
             |   error                   {
                                             yyerror("StmtBlock");
@@ -366,7 +366,7 @@ Stmtlist    :   Stmtlist Stmt           {
 
 Stmt        :   VariableDecl            {
                                             $$ = new DeclStatement($1);
-				                            $$->level_number = global_symtab->level;
+                                            $$->level_number = global_symtab->level;
                                             printf("%15s -> %s \n",  "Stmt", "VariableDecl");
                                         } 
             |   SimpleStmt ';'          {
@@ -448,7 +448,7 @@ LValue      :   Expr '.' T_Identifier   {
                                                 yyerror("Undefined variable");
                                                 printf("Undefined variable name: %s\n", $1);
                                                 $$ = new MemberAccess(new ThisExpression(), $1);
-                                            }
+                                            }cout << "---"<< entity <<"----";
                                             printf("%15s -> %s \n",  "LValue", "T_Identifier");
                                         }
             |   Expr '[' Expr ']'       {
@@ -697,4 +697,3 @@ int main() {
     }
     return 0;
 }
-
