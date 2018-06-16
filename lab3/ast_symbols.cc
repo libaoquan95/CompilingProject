@@ -60,7 +60,7 @@ void FunctionEntity::print()
     printf("%*s", level_number*2, "");
     cout << "function: ";
     return_type->print();
-    cout << " " << name << "( ";
+    cout << " " << name << "( " << endl;
 
     for (auto it = formal_params->begin(); it != formal_params->end(); ++it) {
         (*it)->print();
