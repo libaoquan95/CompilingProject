@@ -45,34 +45,34 @@ void yyerror(const char *msg); // standard error-handling routine
     char *stringConstant;
     double doubleConstant;
     char identifier[MaxIdentLen+1]; // +1 for terminating null
-    Decl              *decl;
-    List<Decl*>       *declList;
-    Type              *type;
-    VarDecl           *varDecl;
-    FnDecl            *fnDecl;
-    List<VarDecl*>    *formals;
-    Identifier        *identObj;
-    List<NamedType*>  *nTList;
-    ClassDecl         *classDecl;
-    InterfaceDecl     *ifaceDecl;
-    List<VarDecl*>    *vardecls;
-    List<Stmt*>       *statements;
-    Stmt              *stmt;
-    PrintStmt         *printStmt;
-    List<Expr*>       *exprList;
-    Expr              *expr;
-    StmtBlock         *stmtBlock;
-    LValue            *lvalue;
-    Call              *call;
-    IfStmt            *ifStmt;
-    WhileStmt         *whileStmt;
-    ForStmt           *forStmt;
-    ReturnStmt        *returnStmt;
-    BreakStmt         *breakStmt;
-    SwitchStmt        *switchStmt;
-    List<Case*>       *caseStmts;
-    Case              *caseStmt;
-    Default           *defStmt;
+    Decl *decl;
+    List<Decl*> *declList;
+    Type *type;
+    VarDecl *varDecl;
+    FnDecl *fnDecl;
+    List<VarDecl*> *formals;
+    Identifier *identObj;
+    List<NamedType*>* nTList;
+    ClassDecl* classDecl;
+    InterfaceDecl* ifaceDecl;
+    List<VarDecl*> *vardecls;
+    List<Stmt*> *statements;
+    Stmt* stmt;
+    PrintStmt* printStmt;
+    List<Expr*>* exprList;
+    Expr* expr;
+    StmtBlock* stmtBlock;
+    LValue* lvalue;
+    Call* call;
+    IfStmt* ifStmt;
+    WhileStmt* whileStmt;
+    ForStmt* forStmt;
+    ReturnStmt* returnStmt;
+    BreakStmt* breakStmt;
+    SwitchStmt* switchStmt;
+    List<Case*>* caseStmts;
+    Case* caseStmt;
+    Default* defStmt;
 }
 
 
@@ -195,6 +195,7 @@ DeclList          :    DeclList Decl        { ($$=$1)->Append($2); }
 Decl              :    VariableDecl         { ReportError::Formatted(&@$, "Cannot declare a variable outside a class.\n"); }
                   |    FunctionDecl         { ReportError::Formatted(&@$, "Cannot declare a function outside a class.\n");   }
                   |    ClassDecl            { $$ = $1; }
+                  |    InterfaceDecl        { $$ = $1; }
                   ;
 
 VariableDecl      : Variable ';'            { $$ = $1; }
