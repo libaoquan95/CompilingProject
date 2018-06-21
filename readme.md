@@ -31,3 +31,12 @@ $ bison parser.y
 $ g++ symbols.cc ast_symbols.cc ast.cc ast_print.cc lex.yy.c parser.tab.c -o parser -std=c++11
 $ ./parser < test/test
 ```
+
+#### 4.lab4 汇编代码生成
+利用 llvm 生成汇编代码
+
+```
+$ cd lab4
+$ make
+$ ./main < test/array1.decaf
+```
