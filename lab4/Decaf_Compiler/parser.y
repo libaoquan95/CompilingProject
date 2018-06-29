@@ -364,8 +364,8 @@ Expr              : LValue '=' Expr               { $$ = new AssignExpr($1, new 
                   | Expr T_And Expr               { $$ = new LogicalExpr($1, new Operator(@2, "&&"), $3); }
                   | Expr T_Or Expr                { $$ = new LogicalExpr($1, new Operator(@2, "||"), $3); }
                   | '!' Expr                      { $$ = new LogicalExpr(new Operator(@1, "!"), $2); }
-                  | LValue T_Increment              { $$ = new PostfixExpr($1, new Operator(@2, "++")); }
-                  | LValue T_Decrement              { $$ = new PostfixExpr($1, new Operator(@2, "--")); }
+                  | LValue T_Increment            { $$ = new PostfixExpr($1, new Operator(@2, "++")); }
+                  | LValue T_Decrement            { $$ = new PostfixExpr($1, new Operator(@2, "--")); }
                   | T_ReadInteger '(' ')'         { $$ = new ReadIntegerExpr(@$); }
                   | T_ReadLine '(' ')'            { $$ = new ReadLineExpr(@$); }
                   | T_New Identifier              { $$ = new NewExpr(@$, new NamedType($2)); }

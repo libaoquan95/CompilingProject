@@ -153,6 +153,15 @@ Type* ForStmt::Check(Hashtable<Decl*>* parentST) {
     return NULL;
 }
 
+/*
+    initstmt
+loopstart:
+    ifz condition goto loopend
+    bodystmt
+    stepstmt
+    goto loopstart
+loopend:
+*/
 Location* ForStmt::Emit(CodeGenerator *cg) {
     init->Emit(cg);
     char* loopStartL = cg->NewLabel();
@@ -181,6 +190,13 @@ Type* WhileStmt::Check(Hashtable<Decl*>* parentST) {
     return NULL;
 }
 
+/*
+loopstart:
+    ifz condition goto loopend
+    loopbody
+    goto loopstart
+loopend:
+*/
 Location* WhileStmt::Emit(CodeGenerator *cg) {
     char* loopStartL = cg->NewLabel();
     char* loopEndL = exitLabel = cg->NewLabel();
@@ -243,6 +259,18 @@ Type* IfStmt::Check(Hashtable<Decl*>* parentST) {
     return NULL;
 }
 
+/*
+    ifz condition goto nextlabel
+    thanbody
+nextlabel:
+---------------------------
+    ifz condition goto elselabel
+    thanbody
+    goto nextlable
+elselbael:
+    elsebody
+nextlabel:
+ */
 Location* IfStmt::Emit(CodeGenerator *cg) {
     Location* testL = test->Emit(cg);
     char* nextLabel = cg->NewLabel();
