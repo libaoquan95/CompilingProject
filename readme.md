@@ -33,7 +33,7 @@ $ ./parser < test/test
 ```
 
 #### 4.lab4 汇编代码生成
-利用 llvm 生成汇编代码
+利用 mips 生成汇编代码
 
 ```
 $ cd lab4
