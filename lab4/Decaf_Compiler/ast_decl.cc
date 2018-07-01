@@ -366,7 +366,7 @@ void FnDecl::Emit(CodeGenerator* cg) {
     Assert(body != NULL);
 
     cg->NewScope();
-ClassDecl* p = dynamic_cast<ClassDecl*>(this->GetParent());
+    ClassDecl* p = dynamic_cast<ClassDecl*>(this->GetParent());
     if(p!=NULL&&strcmp(id->GetName(),"main")!=0){
         string tmp = "f_";
         tmp += p->GetName();

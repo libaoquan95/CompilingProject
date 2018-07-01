@@ -1,6 +1,0 @@
-class main{
-    void main(){
-        string i;
-        i = "Hello World!;
-    }
-}

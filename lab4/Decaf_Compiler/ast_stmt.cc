@@ -67,8 +67,6 @@ void Program::Emit() {
     }
 }
 
-
-
 StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     Assert(d != NULL && s != NULL);
     (decls=d)->SetParentAll(this);
@@ -381,6 +379,10 @@ Type* SwitchStmt::Check(Hashtable<Decl*>* parentST) {
     return NULL;
 }
 
+/*
+    exptstmt
+    
+*/
 Location* SwitchStmt::Emit(CodeGenerator *cg) {
     Location* exprL = e->Emit(cg);
     Location* zeroL = cg->GenLoadConstant(0);
